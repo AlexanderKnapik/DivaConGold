@@ -67,13 +67,21 @@ static uint32_t crc32(const uint8_t *data, size_t length) {
     return ~crc;
 }
 
+static int const_rng(void *p_rng, unsigned char *p, size_t len) {
+    (void)p_rng;
+
+    memset(p, 0x39, len);
+
+    return 0;
+}
+
 void ps4_auth_init(const char *private_key, size_t private_key_len, const uint8_t serial[PS4_AUTH_SERIAL_LENGTH],
                    const uint8_t ca_signature[PS4_AUTH_SIGNATURE_LENGTH], ps4_auth_sign_cb_t sign_cb) {
     mbedtls_pk_context pk_context;
 
     mbedtls_pk_init(&pk_context);
 
-    if (mbedtls_pk_parse_key(&pk_context, (unsigned char *)private_key, private_key_len, NULL, 0)) {
+    if (mbedtls_pk_parse_key(&pk_context, (unsigned char *)private_key, private_key_len, NULL, 0, const_rng, NULL)) {
         auth_state.initialized = false;
         return;
     }

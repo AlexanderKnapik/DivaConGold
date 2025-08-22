@@ -84,13 +84,13 @@ class TouchSliderLeds {
     void setAnimationSpeed(uint8_t speed);
     void setIdleMode(Config::IdleMode mode);
     void setTouchedMode(Config::TouchedMode mode);
-    void setIdleColor(Config::Color color);
-    void setTouchedColor(Config::Color color);
+    void setIdleColor(const Config::Color &color);
+    void setTouchedColor(const Config::Color &color);
     void setEnablePlayerColor(bool do_enable);
     void setEnablePdloaderSupport(bool do_enable);
 
     void setTouched(uint32_t touched);
-    void setPlayerColor(Config::Color color);
+    void setPlayerColor(const Config::Color &color);
 
     void update();
     void update(const RawFrameMessage &frame);
