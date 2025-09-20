@@ -1,0 +1,17 @@
+Id	Description	Qty	Unit	Designators	Manufacturer	MPN	Supplier	SPN
+1	Button, 100 mm	4		SW_CIRCLE, SW_CROSS, SW_SQUARE, SW_TRIANGLE	Samducksa	CWB 401	Istmall	
+2	Cable, 1 x 24 AWG	0	m	W_HOME_START, W_L1_UP, W_L2_L1, W_L3_L2, W_R1_R2, W_R2_R3, W_R3_RIGHT, W_RIGHT_LEFT, W_START_SELECT, W_UP_DOWN				
+3	Cable, 2 x 24 AWG	0	m	W_SW_CIRCLE_SW_CROSS, W_SW_CROSS_SW_SQUARE, W_SW_SQUARE_SW_TRIANGLE				
+4	Cable, 4 x 24 AWG	0	m	W2				
+5	Cable, 5 x 24 AWG	0	m	W5, W6				
+6	Cable, 6 x 24 AWG	0	m	W1, W3, W4				
+7	Connector, Button, Black, 2 pins, BK	5		SW_HOME, SW_L3, SW_R3, SW_SELECT, SW_START	Samducksa	SDB-202C	Pugilist Tech	
+8	Connector, Button, Pink, 2 pins, PK	4		SW_L1, SW_L2, SW_R1, SW_R2	Samducksa	SDB-202C	Pugilist Tech	
+9	Connector, Button, White, 2 pins, WH	4		SW_DOWN, SW_LEFT, SW_RIGHT, SW_UP	Samducksa	SDB-202C	Pugilist Tech	
+10	Connector, JST PH, Female, 4 pins	1		IO_J2	JST	PHR-4	Digikey	455-1164-ND
+11	Connector, JST PH, Female, 5 pins	1		IO_J6	JST	PHR-5	Digikey	455-1163-ND
+12	Connector, JST PH, Female, 6 pins	5		IO_J1, IO_J3, IO_J4, IO_J5, SLIDER_J1	JST	PHR-6	Digikey	455-1162-ND
+13	Connector, Microswitch, 60 g, 4 pins	4		SW_CIRCLE, SW_CROSS, SW_SQUARE, SW_TRIANGLE	Gersung	GSM-V0303A06	Istmall	
+14	Terminal, Crimp	39		IO_J1, IO_J2, IO_J3, IO_J4, IO_J5, IO_J6, SLIDER_J1	JST	SPH-002T-P0.5S	Digikey	455-BPH-002T-P0.5S-ND
+15	Terminal, Faston	16		SW_CIRCLE, SW_CROSS, SW_SQUARE, SW_TRIANGLE	TE Connectivity	2238174-3	Digikey	A141574CT-ND
+16	Terminal, Faston	26		SW_DOWN, SW_HOME, SW_L1, SW_L2, SW_L3, SW_LEFT, SW_R1, SW_R2, SW_R3, SW_RIGHT, SW_SELECT, SW_START, SW_UP	TE Connectivity	61818-1	Digikey	A104101CT-ND
