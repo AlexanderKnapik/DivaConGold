@@ -21,16 +21,33 @@ connectors:
         pincount: 4
         mpn: "PHR-4"
         spn: "455-1164-ND"
+        image:
+            src: "./PHR-4.png"
+            width: 320
     JST_5P: &JST_5P
         <<: *JST
         pincount: 5
         mpn: "PHR-5"
         spn: "455-1163-ND"
+        image:
+            src: "./PHR-5.png"
+            width: 320
     JST_6P: &JST_6P
         <<: *JST
         pincount: 6
         mpn: "PHR-6"
         spn: "455-1162-ND"
+        image:
+            src: "./PHR-6.png"
+            width: 320
+    JST_8P: &JST_8P
+        <<: *JST
+        pincount: 8
+        mpn: "PHR-8"
+        spn: "455-1189-ND"
+        image:
+            src: "./PHR-8.png"
+            width: 320
 
     MICROSWITCH: &MICROSW
         type: "Microswitch"
@@ -139,27 +156,27 @@ connectors:
     SW_SELECT:
         <<: *SAMDUCKSA_BLACK
 
-    IO_J1:
+    J1_IO:
         <<: *JST_6P
         pinlabels: ["GND", "R1", "R2", "R3", "RIGHT", "LEFT"]
-    IO_J2:
+    J2_IO:
         <<: *JST_4P
         pinlabels: ["GND", "HOME", "START", "SELECT"]
-    IO_J3:
+    J3_IO:
         <<: *JST_6P
         pinlabels: ["GND", "L3", "L2", "L1", "UP", "DOWN"]
-    IO_J4:
-        <<: *JST_6P
-        pinlabels: ["GND", "LED_DATA", "SCL", "SDA", "3V3", "5V"]
-    IO_J5:
-        <<: *JST_6P
-        pinlabels: [ "5V", LED-_CIRCLE", "LED-_CROSS", "LED-_SQUARE", "LED-_TRIANGLE", "LED+"]
-    IO_J6:
+    J4_IO:
+        <<: *JST_8P
+        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "LED_DATA", "SLIDER_SCL", "SLIDER_SDA", "3V3", "5V"]
+    J6_IO:
         <<: *JST_5P
         pinlabels: ["GND", "CIRCLE", "CROSS", "SQUARE", "TRIANGLE"]
-    SLIDER_J1:
+    J7_IO:
         <<: *JST_6P
-        pinlabels: ["LED_DATA", "SCL", "SDA", "GND", "3V3", "5V"]
+        pinlabels: ["LED-_CIRCLE", "LED-_CROSS", "LED-_SQUARE", "LED-_TRIANGLE", "LED+", "5V"]
+    J1_SLIDER:
+        <<: *JST_8P
+        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "LED_DATA", "SLIDER_SCL", "SLIDER_SDA", "3V3", "5V"]
 
 cables:
     WIRE: &WIRE
@@ -167,6 +184,7 @@ cables:
         colors: [BK, BN, RD, OG, YE, GN, BU, VT, GY, WH]
         gauge: 24 AWG
         show_equiv: true
+        ignore_in_bom: true
     WIRE_SW:
         <<: *WIRE
         colors: [BK, RD, BN]
@@ -182,7 +200,7 @@ cables:
         wirecount: 6
     W4:
         <<: *WIRE
-        wirecount: 6
+        wirecount: 8
     W5:
         <<: *WIRE
         colors: [RD, BU, VT, GY, WH]
@@ -195,7 +213,7 @@ cables:
 connections:
 # IO BOARD J1 CABLE
     -
-        - IO_J1: [1-6]
+        - J1_IO: [1-6]
         - W1: [1-6]
     -
         - W1: [1-2]
@@ -239,7 +257,7 @@ connections:
 
 # IO BOARD J2 CABLE
     -
-        - IO_J2: [1-4]
+        - J2_IO: [1-4]
         - W2: [1-4]
     -
         - W2: [1-2]
@@ -265,7 +283,7 @@ connections:
 
 # IO BOARD J3 CABLE
     -
-        - IO_J3: [1-6]
+        - J3_IO: [1-6]
         - W3: [1-6]
     -
         - W3: [1-2]
@@ -309,30 +327,13 @@ connections:
 
 # IO BOARD J4 CABLE
     -
-        - IO_J4: [1-6]
-        - W4: [1-6]
-        - SLIDER_J1: [1-6]
-
-# IO BOARD J5 CABLE (LEDS)
-    -
-        - IO_J5: [2-6]
-        - W5: [1-5]
-    -
-        - W5: [1-2]
-        - SW_CIRCLE: [4,3]
-    -
-        - W5: 3
-        - SW_CROSS: 3
-    -
-        - W5: 4
-        - SW_SQUARE: 3
-    -
-        - W5: 5
-        - SW_TRIANGLE: 3
+        - J4_IO: [1-8]
+        - W4: [1-8]
+        - J1_SLIDER: [1-8]
 
 # IO BOARD J6 CABLE (BUTTONS)
     -
-        - IO_J6: [1-5]
+        - J6_IO: [1-5]
         - W6: [1-5]
     -
         - W6: [1-2]
@@ -364,3 +365,20 @@ connections:
     -
         - SW_TRIANGLE: [1, 4]
         - W_SW_SQUARE_SW_TRIANGLE: [1, 2]
+
+# IO BOARD J7 CABLE (LEDS)
+    -
+        - J7_IO: [1-5]
+        - W5: [1-5]
+    -
+        - W5: [1-2]
+        - SW_CIRCLE: [4,3]
+    -
+        - W5: 3
+        - SW_CROSS: 3
+    -
+        - W5: 4
+        - SW_SQUARE: 3
+    -
+        - W5: 5
+        - SW_TRIANGLE: 3
