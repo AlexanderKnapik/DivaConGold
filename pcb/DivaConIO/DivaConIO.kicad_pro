@@ -38,7 +38,7 @@
         "other_text_upright": false,
         "pads": {
           "drill": 0.0,
-          "height": 1.6,
+          "height": 3.0,
           "width": 1.6
         },
         "silk_line_width": 0.15,
@@ -191,7 +191,8 @@
         0.0,
         0.2032,
         0.254,
-        0.508
+        0.508,
+        0.8
       ],
       "tuning_pattern_settings": {
         "diff_pair_defaults": {
@@ -502,7 +503,12 @@
     },
     "net_colors": null,
     "netclass_assignments": null,
-    "netclass_patterns": []
+    "netclass_patterns": [
+      {
+        "netclass": "Default",
+        "pattern": "MP"
+      }
+    ]
   },
   "pcbnew": {
     "last_paths": {
