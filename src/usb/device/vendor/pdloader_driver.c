@@ -25,11 +25,17 @@ enum {
     USBD_ITF_MAX,
 };
 
-#define TUD_PDLOADER_EP_BUFSIZE 64
-#define TUD_PDLOADER_EP_OUT 0x03
-#define TUD_PDLOADER_EP_IN 0x84
+enum {
+    TUD_PDLOADER_EP_BUFSIZE = 64,
+    TUD_PDLOADER_EP_OUT = 0x03,
+    TUD_PDLOADER_EP_IN = 0x84,
+};
 
-#define TUD_PDLOADER_DESC_LEN (9 + 7 + 7)
+enum {
+    TUD_PDLOADER_DESC_LEN = (9 + 7 + 7),
+    TUD_PDLOADER_MS_OS_20_DESC_LEN = 162,
+    TUD_PDLOADER_BOS_VENDOR_REQUEST_MICROSOFT = 1,
+};
 
 #define TUD_PDLOADER_DESCRIPTOR(_itfnum, _stridx, _epout, _epin, _epsize, _ep_interval)                                \
     9, TUSB_DESC_INTERFACE, _itfnum, 0, 2, TUSB_CLASS_VENDOR_SPECIFIC, 0x00, 0x00, _stridx, 7, TUSB_DESC_ENDPOINT,     \
@@ -42,8 +48,6 @@ const uint8_t pdloader_desc_cfg[] = {
     TUD_CONFIG_DESCRIPTOR(1, USBD_ITF_MAX, USBD_STR_LANGUAGE, USBD_DESC_LEN, 0, USBD_MAX_POWER_MAX),
     TUD_PDLOADER_DESCRIPTOR(USBD_ITF_PDLOADER, 0, TUD_PDLOADER_EP_OUT, TUD_PDLOADER_EP_IN, TUD_PDLOADER_EP_BUFSIZE, 1),
 };
-
-#define TUD_PDLOADER_MS_OS_20_DESC_LEN 162
 
 const uint8_t pdloader_desc_ms_os_20[] = {
     // Set header: length, type, windows version, total length
@@ -68,7 +72,6 @@ const uint8_t pdloader_desc_ms_os_20[] = {
     '5', 0x00, '7', 0x00, '9', 0x00, '-', 0x00, '9', 0x00, 'E', 0x00, '3', 0x00, '1', 0x00, '8', 0x00, '9', 0x00, '5',
     0x00, '5', 0x00, 'D', 0x00, 'E', 0x00, '9', 0x00, 'C', 0x00, '}', 0x00, 0x00, 0x00, 0x00, 0x00};
 
-#define TUD_PDLOADER_BOS_VENDOR_REQUEST_MICROSOFT 1
 #define TUD_PDLOADER_BOS_TOTAL_LEN (TUD_BOS_DESC_LEN + TUD_BOS_MICROSOFT_OS_DESC_LEN)
 
 const uint8_t pdloader_desc_bos[] = {
@@ -82,7 +85,7 @@ const uint8_t pdloader_desc_bos[] = {
 // unbuffered interrupt transfers.
 //--------------------------------------------------------------------+
 
-#define USBD_PDLOADER_READ_BUFFER_LEN 100
+enum { USBD_PDLOADER_READ_BUFFER_LEN = 100 };
 
 typedef struct {
     uint8_t itf_num;
@@ -93,10 +96,10 @@ typedef struct {
     CFG_TUSB_MEM_ALIGN uint8_t epout_buf[CFG_TUD_HID_EP_BUFSIZE];
 } pdloader_interface_t;
 
-CFG_TUSB_MEM_SECTION static pdloader_interface_t _pdl_itf;
+CFG_TUSB_MEM_SECTION static pdloader_interface_t pdl_itf;
 
 static bool pdloader_ready() {
-    uint8_t const ep_in = _pdl_itf.ep_in;
+    uint8_t const ep_in = pdl_itf.ep_in;
 
     return tud_ready() && (ep_in != 0) && !usbd_edpt_busy(0, ep_in);
 }
@@ -106,12 +109,12 @@ bool send_pdloader_report(usb_report_t report) {
         return false;
     }
 
-    TU_VERIFY(usbd_edpt_claim(0, _pdl_itf.ep_in));
+    TU_VERIFY(usbd_edpt_claim(0, pdl_itf.ep_in));
 
     uint16_t size = tu_min16(report.size, TUD_PDLOADER_EP_BUFSIZE);
-    memcpy(_pdl_itf.epin_buf, report.data, size);
+    memcpy(pdl_itf.epin_buf, report.data, size);
 
-    return usbd_edpt_xfer(0, _pdl_itf.ep_in, _pdl_itf.epin_buf, size);
+    return usbd_edpt_xfer(0, pdl_itf.ep_in, pdl_itf.epin_buf, size);
 }
 
 // The data PDLoader sends is larger than the Fullspeed USB max size of 64.
@@ -152,7 +155,7 @@ static bool receive_pdloader_report(uint8_t const *buf, uint32_t size) {
 static void pdloader_reset(uint8_t rhport) {
     (void)rhport;
 
-    tu_memclr(&_pdl_itf, sizeof(_pdl_itf));
+    tu_memclr(&pdl_itf, sizeof(pdl_itf));
 }
 
 static void pdloader_init(void) { pdloader_reset(0); }
@@ -165,22 +168,23 @@ static uint16_t pdloader_open(uint8_t rhport, tusb_desc_interface_t const *desc_
     TU_ASSERT(max_len >= drv_len, 0);
     uint8_t const *p_desc = tu_desc_next(desc_itf);
 
-    _pdl_itf.itf_num = desc_itf->bInterfaceNumber;
+    pdl_itf.itf_num = desc_itf->bInterfaceNumber;
 
-    TU_ASSERT(usbd_open_edpt_pair(rhport, p_desc, desc_itf->bNumEndpoints, TUSB_XFER_INTERRUPT, &_pdl_itf.ep_out,
-                                  &_pdl_itf.ep_in),
+    TU_ASSERT(usbd_open_edpt_pair(rhport, p_desc, desc_itf->bNumEndpoints, TUSB_XFER_INTERRUPT, &pdl_itf.ep_out,
+                                  &pdl_itf.ep_in),
               0);
 
-    if (_pdl_itf.ep_out) {
-        TU_ASSERT(usbd_edpt_xfer(rhport, _pdl_itf.ep_out, _pdl_itf.epout_buf, sizeof(_pdl_itf.epout_buf)), 0);
+    if (pdl_itf.ep_out) {
+        TU_ASSERT(usbd_edpt_xfer(rhport, pdl_itf.ep_out, pdl_itf.epout_buf, sizeof(pdl_itf.epout_buf)), 0);
     }
 
     return drv_len;
 }
 
 bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request) {
-    if (stage != CONTROL_STAGE_SETUP)
+    if (stage != CONTROL_STAGE_SETUP) {
         return true;
+    }
 
     if (!(request->bmRequestType_bit.type == TUSB_REQ_TYPE_VENDOR &&
           request->bRequest == TUD_PDLOADER_BOS_VENDOR_REQUEST_MICROSOFT && request->wIndex == 7)) {
@@ -196,9 +200,9 @@ bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_reques
 static bool pdloader_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes) {
     TU_ASSERT(result == XFER_RESULT_SUCCESS);
 
-    if (ep_addr == _pdl_itf.ep_out) {
-        receive_pdloader_report(_pdl_itf.epout_buf, xferred_bytes);
-        TU_ASSERT(usbd_edpt_xfer(rhport, _pdl_itf.ep_out, _pdl_itf.epout_buf, sizeof(_pdl_itf.epout_buf)));
+    if (ep_addr == pdl_itf.ep_out) {
+        receive_pdloader_report(pdl_itf.epout_buf, xferred_bytes);
+        TU_ASSERT(usbd_edpt_xfer(rhport, pdl_itf.ep_out, pdl_itf.epout_buf, sizeof(pdl_itf.epout_buf)));
     }
 
     return true;
@@ -215,11 +219,14 @@ static const usbd_class_driver_t pdloader_app_driver = {
     .xfer_cb = pdloader_xfer_cb,
     .sof = NULL};
 
-const usbd_driver_t pdloader_device_driver = {
-    .name = "PD-Loader",
-    .app_driver = &pdloader_app_driver,
-    .desc_device = &pdloader_desc_device,
-    .desc_cfg = pdloader_desc_cfg,
-    .desc_bos = pdloader_desc_bos,
-    .send_report = send_pdloader_report,
-};
+const usbd_driver_t *get_pdloader_device_driver() {
+    static const usbd_driver_t pdloader_device_driver = {
+        .name = "PD-Loader",
+        .app_driver = &pdloader_app_driver,
+        .desc_device = &pdloader_desc_device,
+        .desc_cfg = pdloader_desc_cfg,
+        .desc_bos = pdloader_desc_bos,
+        .send_report = send_pdloader_report,
+    };
+    return &pdloader_device_driver;
+}

@@ -58,8 +58,10 @@ class TouchSlider {
     };
 
   private:
+    // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions): Class has no members
     class TouchControllerInterface {
       public:
+        virtual ~TouchControllerInterface() = default;
         virtual uint32_t read() = 0;
     };
 

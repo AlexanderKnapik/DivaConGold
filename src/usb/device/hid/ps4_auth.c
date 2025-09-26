@@ -6,7 +6,9 @@
 
 #include <string.h>
 
-#define CHALLENGE_CHUNK_LENGTH (56)
+enum {
+    CHALLENGE_CHUNK_LENGTH = 56,
+};
 
 typedef struct __attribute((packed, aligned(1))) {
     uint8_t report_id;

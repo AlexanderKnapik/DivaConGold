@@ -21,7 +21,7 @@ typedef struct __attribute((packed, aligned(1))) {
     uint8_t _unknown[14];
 } pdloader_report_t;
 
-extern const usbd_driver_t pdloader_device_driver;
+const usbd_driver_t *get_pdloader_device_driver();
 
 bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t const *request);
 
