@@ -1,5 +1,5 @@
-#ifndef _MPR121_MPR121_H_
-#define _MPR121_MPR121_H_
+#ifndef MPR121_MPR121_H_
+#define MPR121_MPR121_H_
 
 #include "hardware/i2c.h"
 
@@ -69,4 +69,4 @@ class Mpr121 {
     void writeRegister(Register reg, uint8_t value, uint8_t offset = 0);
 };
 
-#endif // _MPR121_MPR121_H_
+#endif // MPR121_MPR121_H_

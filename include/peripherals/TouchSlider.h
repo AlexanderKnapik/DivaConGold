@@ -1,5 +1,5 @@
-#ifndef _PERIPHERALS_TOUCHSLIDER_H_
-#define _PERIPHERALS_TOUCHSLIDER_H_
+#ifndef PERIPHERALS_TOUCHSLIDER_H_
+#define PERIPHERALS_TOUCHSLIDER_H_
 
 #include "utils/InputState.h"
 
@@ -123,4 +123,4 @@ class TouchSlider {
 
 } // namespace Divacon::Peripherals
 
-#endif // _PERIPHERALS_TOUCHSLIDER_H_
+#endif // PERIPHERALS_TOUCHSLIDER_H_

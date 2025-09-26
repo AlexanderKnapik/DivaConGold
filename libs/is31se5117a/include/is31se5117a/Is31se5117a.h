@@ -1,5 +1,5 @@
-#ifndef _IS31SE5117A_IS31SE5117A_H_
-#define _IS31SE5117A_IS31SE5117A_H_
+#ifndef IS31SE5117A_IS31SE5117A_H_
+#define IS31SE5117A_IS31SE5117A_H_
 
 #include "hardware/i2c.h"
 
@@ -330,4 +330,4 @@ class Is31se5117a {
     void writeRegister(Register reg, uint8_t value, uint8_t offset = 0);
 };
 
-#endif // _IS31SE5117A_IS31SE5117A_H_
+#endif // IS31SE5117A_IS31SE5117A_H_

@@ -1,5 +1,5 @@
-#ifndef _USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_
-#define _USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_
+#ifndef USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_
+#define USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_
 
 #include "usb/device_driver.h"
 
@@ -29,4 +29,4 @@ bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_reques
 }
 #endif
 
-#endif // _USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_
+#endif // USB_DEVICE_VENDOR_PDLOADER_DRIVER_H_

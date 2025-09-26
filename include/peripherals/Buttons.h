@@ -1,5 +1,5 @@
-#ifndef _PERIPHERALS_BUTTONS_H_
-#define _PERIPHERALS_BUTTONS_H_
+#ifndef PERIPHERALS_BUTTONS_H_
+#define PERIPHERALS_BUTTONS_H_
 
 #include "utils/InputState.h"
 
@@ -103,4 +103,4 @@ class Buttons {
 
 } // namespace Divacon::Peripherals
 
-#endif // _PERIPHERALS_BUTTONS_H_
+#endif // PERIPHERALS_BUTTONS_H_

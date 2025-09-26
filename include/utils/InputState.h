@@ -1,5 +1,5 @@
-#ifndef _UTILS_INPUTSTATE_H_
-#define _UTILS_INPUTSTATE_H_
+#ifndef UTILS_INPUTSTATE_H_
+#define UTILS_INPUTSTATE_H_
 
 #include "usb/device/hid/keyboard_driver.h"
 #include "usb/device/hid/ps3_driver.h"
@@ -80,4 +80,4 @@ struct InputState {
 
 } // namespace Divacon::Utils
 
-#endif // _UTILS_INPUTSTATE_H_
+#endif // UTILS_INPUTSTATE_H_

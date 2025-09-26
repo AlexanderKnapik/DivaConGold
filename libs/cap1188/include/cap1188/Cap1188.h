@@ -1,5 +1,5 @@
-#ifndef _CAP1188_CAP1188_H_
-#define _CAP1188_CAP1188_H_
+#ifndef CAP1188_CAP1188_H_
+#define CAP1188_CAP1188_H_
 
 #include "hardware/i2c.h"
 
@@ -140,4 +140,4 @@ class Cap1188 {
     void writeRegister(Register reg, uint8_t value, uint8_t offset = 0);
 };
 
-#endif // _CAP1188_CAP1188_H_
+#endif // CAP1188_CAP1188_H_

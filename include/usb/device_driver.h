@@ -1,5 +1,5 @@
-#ifndef _USB_DEVICE_DRIVER_H_
-#define _USB_DEVICE_DRIVER_H_
+#ifndef USB_DEVICE_DRIVER_H_
+#define USB_DEVICE_DRIVER_H_
 
 #include "device/usbd_pvt.h"
 
@@ -102,4 +102,4 @@ usbd_button_led_cb_t usbd_driver_get_button_led_cb();
 }
 #endif
 
-#endif // _USB_DEVICE_DRIVER_H_
+#endif // USB_DEVICE_DRIVER_H_

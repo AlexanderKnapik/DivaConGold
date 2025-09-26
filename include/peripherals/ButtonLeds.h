@@ -1,5 +1,5 @@
-#ifndef _PERIPHERALS_BUTTONLEDS_H_
-#define _PERIPHERALS_BUTTONLEDS_H_
+#ifndef PERIPHERALS_BUTTONLEDS_H_
+#define PERIPHERALS_BUTTONLEDS_H_
 
 #include "usb/device_driver.h"
 #include "utils/InputState.h"
@@ -39,4 +39,4 @@ class ButtonLeds {
 
 } // namespace Divacon::Peripherals
 
-#endif // _PERIPHERALS_BUTTONLEDS_H_
+#endif // PERIPHERALS_BUTTONLEDS_H_

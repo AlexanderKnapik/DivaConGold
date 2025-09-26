@@ -1,5 +1,5 @@
-#ifndef _PERIPHERALS_TOUCHSLIDERLEDS_H_
-#define _PERIPHERALS_TOUCHSLIDERLEDS_H_
+#ifndef PERIPHERALS_TOUCHSLIDERLEDS_H_
+#define PERIPHERALS_TOUCHSLIDERLEDS_H_
 
 #include <algorithm>
 #include <array>
@@ -98,4 +98,4 @@ class TouchSliderLeds {
 
 } // namespace Divacon::Peripherals
 
-#endif // _PERIPHERALS_TOUCHSLIDERLEDS_H_
+#endif // PERIPHERALS_TOUCHSLIDERLEDS_H_

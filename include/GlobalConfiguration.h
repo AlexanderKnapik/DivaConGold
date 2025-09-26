@@ -1,3 +1,6 @@
+#ifndef GLOBALCONFIGURATION_H_
+#define GLOBALCONFIGURATION_H_
+
 #include "peripherals/ButtonLeds.h"
 #include "peripherals/Buttons.h"
 #include "peripherals/Display.h"
@@ -110,3 +113,5 @@ const Peripherals::Display::Config display_config = {
 };
 
 } // namespace Divacon::Config::Default
+
+#endif // GLOBALCONFIGURATION_H_
