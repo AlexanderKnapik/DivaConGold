@@ -47,7 +47,7 @@ const static std::array<std::array<TouchSliderLeds::Config::Color, rainbow_lengt
 // NOLINTEND(modernize-use-designated-initializers)
 
 struct AnimationStepper {
-    const uint32_t steps_to_advance;
+    uint32_t steps_to_advance;
     uint32_t current_steps;
 
     uint32_t advance(uint32_t steps) {
@@ -131,15 +131,15 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
 
         if (pulse_advance_factor < 0 && advance >= (uint8_t)(pulse_dim_percent - pulse_dim_percent_min)) {
             pulse_dim_percent = pulse_dim_percent_min;
-            pulse_advance_factor = -pulse_advance_factor;
+            pulse_advance_factor = (int8_t)(-pulse_advance_factor);
         } else if (pulse_advance_factor > 0 && advance + pulse_dim_percent >= pulse_dim_percent_max) {
             pulse_dim_percent = pulse_dim_percent_max;
-            pulse_advance_factor = -pulse_advance_factor;
+            pulse_advance_factor = (int8_t)(-pulse_advance_factor);
         } else {
             pulse_dim_percent = pulse_dim_percent + (pulse_advance_factor * advance);
         }
 
-        m_idle_buffer.fill(dim_color(idle_color, (float)pulse_dim_percent / 100.));
+        m_idle_buffer.fill(dim_color(idle_color, (float)pulse_dim_percent / 100.F));
     } break;
     case Config::IdleMode::RainbowCycle:
         rainbow_position =
@@ -151,7 +151,7 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
 
         for (size_t idx = 0; idx < m_idle_buffer.size(); ++idx) {
             size_t offset = (frame_position + idx) % rainbow_length;
-            m_idle_buffer[idx] = rainbow_colors[frame][offset];
+            m_idle_buffer.at(idx) = rainbow_colors.at(frame).at(offset);
         }
     } break;
     }
@@ -170,9 +170,9 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
     case Config::TouchedMode::Touched:
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if (m_touched & ((uint32_t)0x80000000 >> idx)) {
-                m_touched_buffer[idx] = m_config.touched_color;
+                m_touched_buffer.at(idx) = m_config.touched_color;
             } else {
-                m_touched_buffer[idx] = {.r = 0x00, .g = 0x00, .b = 0x00};
+                m_touched_buffer.at(idx) = {.r = 0x00, .g = 0x00, .b = 0x00};
             }
         }
         break;
@@ -181,11 +181,11 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if (m_touched & ((uint32_t)0x80000000 >> idx)) {
-                m_touched_buffer[idx] = m_config.touched_color;
-                fade_percent[idx] = 100;
+                m_touched_buffer.at(idx) = m_config.touched_color;
+                fade_percent.at(idx) = 100;
             } else {
-                m_touched_buffer[idx] = dim_color(m_touched_buffer[idx], (float)fade_percent[idx] / 100.);
-                fade_percent[idx] = advance > fade_percent[idx] ? 0 : fade_percent[idx] - advance;
+                m_touched_buffer.at(idx) = dim_color(m_touched_buffer.at(idx), (float)fade_percent.at(idx) / 100.F);
+                fade_percent.at(idx) = advance > fade_percent.at(idx) ? 0 : fade_percent.at(idx) - advance;
             }
         }
     } break;
@@ -194,11 +194,11 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if (m_touched & ((uint32_t)0x80000000 >> idx)) {
-                m_touched_buffer[idx] = m_idle_buffer[idx];
-                fade_percent[idx] = 100;
+                m_touched_buffer.at(idx) = m_idle_buffer.at(idx);
+                fade_percent.at(idx) = 100;
             } else {
-                m_touched_buffer[idx] = dim_color(m_touched_buffer[idx], (float)fade_percent[idx] / 100.);
-                fade_percent[idx] = advance > fade_percent[idx] ? 0 : fade_percent[idx] - advance;
+                m_touched_buffer.at(idx) = dim_color(m_touched_buffer.at(idx), (float)fade_percent.at(idx) / 100.F);
+                fade_percent.at(idx) = advance > fade_percent.at(idx) ? 0 : fade_percent.at(idx) - advance;
             }
         }
     } break;
@@ -216,17 +216,17 @@ void TouchSliderLeds::render(uint32_t steps) {
         blend_percent = blend_advance + blend_percent > 100 ? 100 : blend_percent + blend_advance;
     }
 
-    const float brightness_dim_factor = (float)m_config.brightness / 255.;
-    const float blend_dim_factor = (float)blend_percent / 100.;
+    const auto brightness_dim_factor = (float)m_config.brightness / 255.F;
+    const auto blend_dim_factor = (float)blend_percent / 100.F;
 
     size_t idx = 0;
     for (auto &rendered_segment : m_rendered_frame) {
-        auto blended_segment = max_color(dim_color(m_idle_buffer[idx / m_config.leds_per_segment], blend_dim_factor),
-                                         m_touched_buffer[idx / m_config.leds_per_segment]);
+        auto blended_segment = max_color(dim_color(m_idle_buffer.at(idx / m_config.leds_per_segment), blend_dim_factor),
+                                         m_touched_buffer.at(idx / m_config.leds_per_segment));
 
-        rendered_segment =
-            ws2812_rgb_to_u32pixel(blended_segment.r * brightness_dim_factor, blended_segment.g * brightness_dim_factor,
-                                   blended_segment.b * brightness_dim_factor);
+        rendered_segment = ws2812_rgb_to_u32pixel((uint8_t)((float)blended_segment.r * brightness_dim_factor),
+                                                  (uint8_t)((float)blended_segment.g * brightness_dim_factor),
+                                                  (uint8_t)((float)blended_segment.b * brightness_dim_factor));
 
         ++idx;
     }
@@ -269,7 +269,8 @@ void TouchSliderLeds::update(const TouchSliderLeds::RawFrameMessage &frame) {
             if (color_max > m_config.brightness) {
                 float dim_factor = (float)m_config.brightness / (float)color_max;
                 m_rendered_frame.at((idx * m_config.leds_per_segment) + led) = ws2812_rgb_to_u32pixel(
-                    (float)color.r * dim_factor, (float)color.g * dim_factor, (float)color.b * dim_factor);
+                    (uint8_t)((float)color.r * dim_factor), (uint8_t)((float)color.g * dim_factor),
+                    (uint8_t)((float)color.b * dim_factor));
             } else {
                 m_rendered_frame.at((idx * m_config.leds_per_segment) + led) =
                     ws2812_rgb_to_u32pixel(color.r, color.g, color.b);

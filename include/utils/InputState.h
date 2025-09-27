@@ -40,21 +40,21 @@ struct InputState {
     };
 
   public:
-    DPad dpad;
-    Buttons buttons;
+    DPad dpad{};       // NOLINT
+    Buttons buttons{}; // NOLINT
     struct {
         AnalogStick left = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
         AnalogStick right = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
-    } sticks;
-    uint32_t touches;
+    } sticks;            // NOLINT
+    uint32_t touches{0}; // NOLINT
 
   private:
-    hid_switch_report_t m_switch_report;
-    hid_ps3_report_t m_ps3_report;
-    hid_ps4_report_t m_ps4_report;
-    hid_nkro_keyboard_report_t m_keyboard_report;
-    xinput_report_t m_xinput_report;
-    pdloader_report_t m_pdloader_report;
+    hid_switch_report_t m_switch_report{};
+    hid_ps3_report_t m_ps3_report{};
+    hid_ps4_report_t m_ps4_report{};
+    hid_nkro_keyboard_report_t m_keyboard_report{};
+    xinput_report_t m_xinput_report{};
+    pdloader_report_t m_pdloader_report{};
     midi_report_t m_midi_report{
         .kick = false,
         .snare = false,
@@ -69,8 +69,8 @@ struct InputState {
     std::string m_debug_report;
 
     usb_report_t getSwitchReport();
-    usb_report_t getPS3InputReport();
-    usb_report_t getPS4InputReport();
+    usb_report_t getPS3Report();
+    usb_report_t getPS4Report();
     usb_report_t getXinputReport();
     usb_report_t getPDLoaderReport();
     usb_report_t getKeyboardReport();

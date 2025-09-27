@@ -31,15 +31,15 @@ class Display {
     };
 
     Config m_config;
-    State m_state;
+    State m_state{State::Idle};
 
-    uint32_t m_touched;
-    Utils::InputState::Buttons m_buttons;
-    usb_mode_t m_usb_mode;
-    uint8_t m_player_id;
-    Utils::Menu::State m_menu_state;
+    uint32_t m_touched{0};
+    Utils::InputState::Buttons m_buttons{};
+    usb_mode_t m_usb_mode{USB_MODE_DEBUG};
+    uint8_t m_player_id{0};
+    Utils::Menu::State m_menu_state{};
 
-    ssd1306_t m_display;
+    ssd1306_t m_display{};
 
     void drawIdleScreen();
     void drawMenuScreen();

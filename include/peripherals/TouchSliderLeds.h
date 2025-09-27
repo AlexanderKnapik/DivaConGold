@@ -64,8 +64,8 @@ class TouchSliderLeds {
 
     std::vector<uint32_t> m_rendered_frame;
 
-    std::array<Config::Color, SEGMENT_COUNT> m_idle_buffer;
-    std::array<Config::Color, SEGMENT_COUNT> m_touched_buffer;
+    std::array<Config::Color, SEGMENT_COUNT> m_idle_buffer{};
+    std::array<Config::Color, SEGMENT_COUNT> m_touched_buffer{};
 
     std::optional<Config::Color> m_player_color;
 

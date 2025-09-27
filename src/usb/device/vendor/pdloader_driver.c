@@ -191,7 +191,7 @@ bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_reques
         return false;
     }
 
-    uint16_t total_len;
+    uint16_t total_len = 0;
     memcpy(&total_len, pdloader_desc_ms_os_20 + 8, 2);
 
     return tud_control_xfer(rhport, request, (void *)(uintptr_t)pdloader_desc_ms_os_20, total_len);

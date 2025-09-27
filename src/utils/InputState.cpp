@@ -12,11 +12,11 @@ usb_report_t InputState::getReport(usb_mode_t mode) {
     case USB_MODE_SWITCH_HORIPAD:
         return getSwitchReport();
     case USB_MODE_DUALSHOCK3:
-        return getPS3InputReport();
+        return getPS3Report();
     case USB_MODE_PS4_DIVACON:
     case USB_MODE_PS4_COMPAT:
     case USB_MODE_DUALSHOCK4:
-        return getPS4InputReport();
+        return getPS4Report();
     case USB_MODE_XBOX360:
         return getXinputReport();
     case USB_MODE_PDLOADER:
@@ -78,10 +78,10 @@ usb_report_t InputState::getSwitchReport() {
     m_switch_report.rx = sticks.right.x;
     m_switch_report.ry = sticks.right.y;
 
-    return {(uint8_t *)&m_switch_report, sizeof(hid_switch_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_switch_report), sizeof(hid_switch_report_t)};
 }
 
-usb_report_t InputState::getPS3InputReport() {
+usb_report_t InputState::getPS3Report() {
     memset(&m_ps3_report, 0, sizeof(m_ps3_report));
 
     m_ps3_report.report_id = 0x01;
@@ -129,10 +129,10 @@ usb_report_t InputState::getPS3InputReport() {
 
     m_ps3_report.unknown_0x02_2 = 0x02;
 
-    return {(uint8_t *)&m_ps3_report, sizeof(hid_ps3_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_ps3_report), sizeof(hid_ps3_report_t)};
 }
 
-usb_report_t InputState::getPS4InputReport() {
+usb_report_t InputState::getPS4Report() {
     static uint8_t report_counter = 0;
 
     memset(&m_ps4_report, 0, sizeof(m_ps4_report));
@@ -177,7 +177,7 @@ usb_report_t InputState::getPS4InputReport() {
         report_counter = 0;
     }
 
-    return {(uint8_t *)&m_ps4_report, sizeof(hid_ps4_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_ps4_report), sizeof(hid_ps4_report_t)};
 }
 
 usb_report_t InputState::getXinputReport() {
@@ -210,7 +210,7 @@ usb_report_t InputState::getXinputReport() {
     m_xinput_report.rx = static_cast<int16_t>(((sticks.right.x << 8) | sticks.right.x) + INT16_MIN);
     m_xinput_report.ry = static_cast<int16_t>(~((sticks.right.y << 8) | sticks.right.y) + INT16_MIN);
 
-    return {(uint8_t *)&m_xinput_report, sizeof(xinput_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_xinput_report), sizeof(xinput_report_t)};
 }
 
 usb_report_t InputState::getPDLoaderReport() {
@@ -246,7 +246,7 @@ usb_report_t InputState::getPDLoaderReport() {
     m_pdloader_report.slider4 = (reversed_touches & 0x0ff00000) >> 20;
     m_pdloader_report.slider5 = (reversed_touches & 0xf0000000) >> 28;
 
-    return {(uint8_t *)&m_pdloader_report, sizeof(pdloader_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_pdloader_report), sizeof(pdloader_report_t)};
 }
 
 usb_report_t InputState::getKeyboardReport() {
@@ -285,7 +285,7 @@ usb_report_t InputState::getKeyboardReport() {
     set_key(sticks.right.x < AnalogStick::CENTER, HID_KEY_U);
     set_key(sticks.right.x > AnalogStick::CENTER, HID_KEY_O);
 
-    return {(uint8_t *)&m_keyboard_report, sizeof(hid_nkro_keyboard_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_keyboard_report), sizeof(hid_keyboard_report_t)};
 }
 
 usb_report_t InputState::getMidiReport() {
@@ -319,7 +319,7 @@ usb_report_t InputState::getMidiReport() {
     m_midi_report.damper = buttons.l1 || buttons.r1;
     m_midi_report.portamento = buttons.l2 || buttons.r2;
 
-    return {(uint8_t *)&m_midi_report, sizeof(midi_report_t)};
+    return {reinterpret_cast<uint8_t *>(&m_midi_report), sizeof(midi_report_t)};
 }
 
 usb_report_t InputState::getDebugReport() {
@@ -351,7 +351,7 @@ usb_report_t InputState::getDebugReport() {
 
     m_debug_report = out.str();
 
-    return {(uint8_t *)m_debug_report.c_str(), static_cast<uint16_t>(m_debug_report.size() + 1)};
+    return {reinterpret_cast<uint8_t *>(m_debug_report.data()), static_cast<uint16_t>(m_debug_report.size() + 1)};
 }
 
 void InputState::releaseAll() {

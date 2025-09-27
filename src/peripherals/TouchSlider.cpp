@@ -21,7 +21,7 @@ TouchSlider::TouchControllerMpr121x3::TouchControllerMpr121x3(const TouchSlider:
                                                               i2c_inst *i2c) {
     size_t idx = 0;
     for (auto &mpr121 : m_mpr121) {
-        mpr121 = std::make_unique<Mpr121>(config.i2c_addresses[idx], i2c, config.touch_threshold,
+        mpr121 = std::make_unique<Mpr121>(config.i2c_addresses.at(idx), i2c, config.touch_threshold,
                                           config.release_threshold, true);
         idx++;
     }
@@ -43,7 +43,7 @@ TouchSlider::TouchControllerMpr121x4::TouchControllerMpr121x4(const TouchSlider:
                                                               i2c_inst *i2c) {
     size_t idx = 0;
     for (auto &mpr121 : m_mpr121) {
-        mpr121 = std::make_unique<Mpr121>(config.i2c_addresses[idx], i2c, config.touch_threshold,
+        mpr121 = std::make_unique<Mpr121>(config.i2c_addresses.at(idx), i2c, config.touch_threshold,
                                           config.release_threshold, true);
         idx++;
     }
@@ -66,7 +66,7 @@ uint32_t TouchSlider::TouchControllerMpr121x4::read() {
 TouchSlider::TouchControllerCap1188::TouchControllerCap1188(const TouchSlider::Config::Cap1188 &config, i2c_inst *i2c) {
     size_t idx = 0;
     for (auto &cap1188 : m_cap1188) {
-        cap1188 = std::make_unique<Cap1188>(config.i2c_addresses[idx], i2c, config.threshold, config.sensitivity,
+        cap1188 = std::make_unique<Cap1188>(config.i2c_addresses.at(idx), i2c, config.threshold, config.sensitivity,
                                             Cap1188::Gain::G1);
         idx++;
     }
@@ -89,7 +89,7 @@ TouchSlider::TouchControllerIs31se5117a::TouchControllerIs31se5117a(const TouchS
     size_t idx = 0;
     for (auto &is31se5117a : m_is31se5117a) {
         is31se5117a =
-            std::make_unique<Is31se5117a>(config.i2c_addresses[idx], i2c, config.threshold, config.hysteresis);
+            std::make_unique<Is31se5117a>(config.i2c_addresses.at(idx), i2c, config.threshold, config.hysteresis);
         idx++;
     }
 }

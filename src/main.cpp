@@ -72,11 +72,11 @@ void core1_task() {
                                        Config::Default::touch_slider_leds_config.enable_pdloader_support);
 
     Utils::PS4AuthProvider ps4authprovider;
-    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge;
+    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge{};
 
-    ControlMessage control_msg;
-    Utils::Menu::State menu_display_msg;
-    Utils::InputState::InputMessage input_msg;
+    ControlMessage control_msg{};
+    Utils::Menu::State menu_display_msg{};
+    Utils::InputState::InputMessage input_msg{};
     Peripherals::TouchSliderLeds::RawFrameMessage slider_led_msg;
 
     while (true) {
@@ -168,7 +168,7 @@ int main() {
     queue_init(&auth_signed_challenge_queue, sizeof(std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH>), 1);
 
     Utils::InputState input_state;
-    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response;
+    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response{};
 
     auto settings_store = std::make_shared<Utils::SettingsStore>();
     Utils::Menu menu(settings_store);
@@ -201,11 +201,13 @@ int main() {
                 break;
             }
 
-            led_message[led_message.size() - 1 - color_idx] =
+            led_message.at(led_message.size() - 1 - color_idx) =
                 Peripherals::TouchSliderLeds::TouchSliderLeds::Config::Color{
+                    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                     .r = frame[color_idx * 3 + 1],
                     .g = frame[color_idx * 3],
                     .b = frame[color_idx * 3 + 2],
+                    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 };
         }
 
