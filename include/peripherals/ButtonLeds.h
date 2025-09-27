@@ -33,7 +33,7 @@ class ButtonLeds {
 
     void setButtons(const Utils::InputState::Buttons &buttons);
 
-    void update();
+    void update() const;
     void update(const usb_button_led_t &raw);
 };
 

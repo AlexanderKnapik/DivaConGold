@@ -14,7 +14,7 @@ namespace Divacon::Utils {
 
 class Menu {
   public:
-    enum class Page {
+    enum class Page : uint8_t {
         Main,
 
         DeviceMode,
@@ -50,7 +50,7 @@ class Menu {
     };
 
     struct Descriptor {
-        enum class Type {
+        enum class Type : uint8_t {
             Menu,
             Selection,
             Value,
@@ -58,7 +58,7 @@ class Menu {
             RebootInfo,
         };
 
-        enum class Action {
+        enum class Action : uint8_t {
             None,
             GotoParent,
 
@@ -130,7 +130,7 @@ class Menu {
 
     void activate();
     void update(const InputState &input_state);
-    bool active();
+    [[nodiscard]] bool active() const;
     State getState();
 };
 } // namespace Divacon::Utils

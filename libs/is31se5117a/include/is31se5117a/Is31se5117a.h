@@ -5,7 +5,7 @@
 
 class Is31se5117a {
   public:
-    enum class Register {
+    enum class Register : uint16_t {
         // ------
         // All Pages
         // ------
@@ -292,12 +292,11 @@ class Is31se5117a {
     };
 
   private:
-    enum class RegisterPage {
+    enum class RegisterPage : uint8_t {
         Page0,
         Page1,
     };
 
-  private:
     i2c_inst *m_i2c;
     uint8_t m_address;
 

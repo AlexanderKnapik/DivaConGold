@@ -4,9 +4,9 @@ namespace Divacon::Utils {
 
 namespace {
 
-static InputState::Buttons checkPressed(const InputState &input_state) {
+InputState::Buttons checkPressed(const InputState &input_state) {
     struct ButtonState {
-        enum State {
+        enum State : uint8_t {
             Idle,
             RepeatDelay,
             Repeat,
@@ -245,11 +245,11 @@ uint8_t Menu::getCurrentValue(Menu::Page page) {
     case Page::LedTouchedColorBlue:
         return m_store->getLedTouchedColor().b;
     case Page::LedEnablePlayerColor:
-        return m_store->getLedEnablePlayerColor();
+        return static_cast<uint8_t>(m_store->getLedEnablePlayerColor());
     case Page::LedEnablePdloaderSupport:
-        return m_store->getLedEnablePdloaderSupport();
+        return static_cast<uint8_t>(m_store->getLedEnablePdloaderSupport());
     case Page::InputMirrorToDpad:
-        return m_store->getInputMirrorToDpad();
+        return static_cast<uint8_t>(m_store->getInputMirrorToDpad());
     case Page::Main:
     case Page::Led:
     case Page::LedIdleColor:
@@ -486,8 +486,6 @@ void Menu::performAction(Descriptor::Action action, uint8_t value) {
         gotoPage(Page::BootselMsg);
         break;
     }
-
-    return;
 }
 
 void Menu::update(const InputState &input_state) {
@@ -511,7 +509,7 @@ void Menu::update(const InputState &input_state) {
             }
             break;
         case Descriptor::Type::Toggle:
-            current_state.selected_value = !current_state.selected_value;
+            current_state.selected_value = current_state.selected_value == 0 ? 1 : 0;
             performAction(descriptor_it->second.items.at(0).second, current_state.selected_value);
             break;
         case Descriptor::Type::Selection:
@@ -542,7 +540,7 @@ void Menu::update(const InputState &input_state) {
             }
             break;
         case Descriptor::Type::Toggle:
-            current_state.selected_value = !current_state.selected_value;
+            current_state.selected_value = current_state.selected_value == 0 ? 1 : 0;
             performAction(descriptor_it->second.items.at(0).second, current_state.selected_value);
             break;
         case Descriptor::Type::Selection:
@@ -594,7 +592,7 @@ void Menu::update(const InputState &input_state) {
     }
 }
 
-bool Menu::active() { return m_active; }
+bool Menu::active() const { return m_active; }
 
 Menu::State Menu::getState() { return m_state_stack.top(); }
 

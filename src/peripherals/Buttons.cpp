@@ -69,7 +69,7 @@ Buttons::Buttons(const Config &config) : m_config(config) {
 
     for (const auto &button : m_buttons) {
         gpio_init(button.second.getGpioPin());
-        gpio_set_dir(button.second.getGpioPin(), GPIO_IN);
+        gpio_set_dir(button.second.getGpioPin(), (bool)GPIO_IN);
         gpio_pull_up(button.second.getGpioPin());
     }
 }
@@ -80,7 +80,7 @@ void Buttons::updateInputState(Utils::InputState &input_state) {
     const uint32_t gpio_state = ~gpio_get_all();
 
     for (auto &button : m_buttons) {
-        button.second.setState(gpio_state & button.second.getGpioMask(), m_config.debounce_delay_ms);
+        button.second.setState((gpio_state & button.second.getGpioMask()) != 0, m_config.debounce_delay_ms);
     }
 
     input_state.dpad.up = m_buttons.at(Id::UP).getState();

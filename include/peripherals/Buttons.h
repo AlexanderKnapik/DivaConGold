@@ -44,7 +44,7 @@ class Buttons {
     };
 
   private:
-    enum class Id {
+    enum class Id : uint8_t {
         UP,
         DOWN,
         LEFT,

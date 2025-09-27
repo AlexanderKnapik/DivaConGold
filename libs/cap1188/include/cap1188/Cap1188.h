@@ -5,7 +5,7 @@
 
 class Cap1188 {
   public:
-    enum class Register {
+    enum class Register : uint8_t {
         MAIN_CONTROL = 0x00,
 
         GENERAL_STATUS = 0x02,
@@ -98,7 +98,7 @@ class Cap1188 {
         REVISION = 0xFF,
     };
 
-    enum class Sensitivity {
+    enum class Sensitivity : uint8_t {
         S128 = 0x00, // Most sensitive
         S64 = 0x01,
         S32 = 0x02, // default
@@ -109,7 +109,7 @@ class Cap1188 {
         S1 = 0x07, // Least sensitive
     };
 
-    enum class Gain {
+    enum class Gain : uint8_t {
         G1 = 0x00,
         G2 = 0x01,
         G4 = 0x02,

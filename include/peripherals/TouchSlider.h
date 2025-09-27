@@ -105,7 +105,6 @@ class TouchSlider {
         uint32_t read() final;
     };
 
-  private:
     Config m_config;
     usb_mode_t m_mode;
     uint32_t m_touched{0};
@@ -114,8 +113,8 @@ class TouchSlider {
 
     void read();
 
-    void updateInputStateArcade(Utils::InputState &input_state);
-    void updateInputStateStick(Utils::InputState &input_state);
+    void updateInputStateArcade(Utils::InputState &input_state) const;
+    void updateInputStateStick(Utils::InputState &input_state) const;
 
   public:
     TouchSlider(const Config &config, usb_mode_t mode);

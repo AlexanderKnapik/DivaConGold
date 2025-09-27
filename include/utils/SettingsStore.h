@@ -39,7 +39,7 @@ class SettingsStore {
     };
     static_assert(sizeof(Storecache) == m_store_size);
 
-    enum class RebootType {
+    enum class RebootType : uint8_t {
         None,
         Normal,
         Bootsel,
@@ -50,41 +50,40 @@ class SettingsStore {
 
     RebootType m_scheduled_reboot{RebootType::None};
 
-  private:
     Storecache read();
 
   public:
     SettingsStore();
 
     void setUsbMode(usb_mode_t mode);
-    usb_mode_t getUsbMode();
+    [[nodiscard]] usb_mode_t getUsbMode() const;
 
     void setLedBrightness(uint8_t brightness);
-    uint8_t getLedBrightness();
+    [[nodiscard]] uint8_t getLedBrightness() const;
 
     void setLedAnimationSpeed(uint8_t speed);
-    uint8_t getLedAnimationSpeed();
+    [[nodiscard]] uint8_t getLedAnimationSpeed() const;
 
     void setLedIdleMode(Peripherals::TouchSliderLeds::Config::IdleMode mode);
-    Peripherals::TouchSliderLeds::Config::IdleMode getLedIdleMode();
+    [[nodiscard]] Peripherals::TouchSliderLeds::Config::IdleMode getLedIdleMode() const;
 
     void setLedTouchedMode(Peripherals::TouchSliderLeds::Config::TouchedMode mode);
-    Peripherals::TouchSliderLeds::Config::TouchedMode getLedTouchedMode();
+    [[nodiscard]] Peripherals::TouchSliderLeds::Config::TouchedMode getLedTouchedMode() const;
 
     void setLedIdleColor(Peripherals::TouchSliderLeds::Config::Color color);
-    Peripherals::TouchSliderLeds::Config::Color getLedIdleColor();
+    [[nodiscard]] Peripherals::TouchSliderLeds::Config::Color getLedIdleColor() const;
 
     void setLedTouchedColor(Peripherals::TouchSliderLeds::Config::Color color);
-    Peripherals::TouchSliderLeds::Config::Color getLedTouchedColor();
+    [[nodiscard]] Peripherals::TouchSliderLeds::Config::Color getLedTouchedColor() const;
 
     void setLedEnablePlayerColor(bool do_enable);
-    bool getLedEnablePlayerColor();
+    [[nodiscard]] bool getLedEnablePlayerColor() const;
 
     void setLedEnablePdloaderSupport(bool do_enable);
-    bool getLedEnablePdloaderSupport();
+    [[nodiscard]] bool getLedEnablePdloaderSupport() const;
 
     void setInputMirrorToDpad(bool do_mirror);
-    bool getInputMirrorToDpad();
+    [[nodiscard]] bool getInputMirrorToDpad() const;
 
     void scheduleReboot(bool bootsel = false);
 

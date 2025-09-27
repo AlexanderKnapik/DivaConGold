@@ -132,7 +132,7 @@ TouchSlider::TouchSlider(const Config &config, usb_mode_t mode) : m_config(confi
         m_config.touch_config);
 }
 
-void TouchSlider::updateInputStateArcade(Utils::InputState &input_state) {
+void TouchSlider::updateInputStateArcade(Utils::InputState &input_state) const {
     // The 32bit state vector is mapped into the 4 8bit axes of the analog sticks, XORed
     // with the stick center postion to ensure no stick movement when the slider is not touched.
     input_state.sticks.right.y = (uint8_t)((m_touched & 0xFF000000) >> 24) ^ Utils::InputState::AnalogStick::CENTER;
@@ -141,7 +141,7 @@ void TouchSlider::updateInputStateArcade(Utils::InputState &input_state) {
     input_state.sticks.left.x = (uint8_t)((m_touched & 0x000000FF)) ^ Utils::InputState::AnalogStick::CENTER;
 }
 
-void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
+void TouchSlider::updateInputStateStick(Utils::InputState &input_state) const {
     struct State {
         uint8_t left_limit;
         uint8_t right_limit;

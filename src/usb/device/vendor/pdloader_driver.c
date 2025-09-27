@@ -164,7 +164,7 @@ static uint16_t pdloader_open(uint8_t rhport, tusb_desc_interface_t const *desc_
     TU_VERIFY(TUSB_CLASS_VENDOR_SPECIFIC == desc_itf->bInterfaceClass, 0);
 
     uint16_t const drv_len =
-        (uint16_t)(sizeof(tusb_desc_interface_t) + desc_itf->bNumEndpoints * sizeof(tusb_desc_endpoint_t));
+        (uint16_t)(sizeof(tusb_desc_interface_t) + (desc_itf->bNumEndpoints * sizeof(tusb_desc_endpoint_t)));
     TU_ASSERT(max_len >= drv_len, 0);
     uint8_t const *p_desc = tu_desc_next(desc_itf);
 
@@ -194,7 +194,7 @@ bool pdloader_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_reques
     uint16_t total_len = 0;
     memcpy(&total_len, pdloader_desc_ms_os_20 + 8, 2);
 
-    return tud_control_xfer(rhport, request, (void *)(uintptr_t)pdloader_desc_ms_os_20, total_len);
+    return tud_control_xfer(rhport, request, (void *)pdloader_desc_ms_os_20, total_len);
 }
 
 static bool pdloader_xfer_cb(uint8_t rhport, uint8_t ep_addr, xfer_result_t result, uint32_t xferred_bytes) {

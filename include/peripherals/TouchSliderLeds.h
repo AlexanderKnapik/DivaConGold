@@ -24,7 +24,7 @@ class TouchSliderLeds {
             bool operator!=(const Color &) const = default;
         };
 
-        enum class IdleMode {
+        enum class IdleMode : uint8_t {
             Off,
             Static,
             Pulse,
@@ -32,7 +32,7 @@ class TouchSliderLeds {
             RainbowCycle,
         };
 
-        enum class TouchedMode {
+        enum class TouchedMode : uint8_t {
             Off,
             Idle,
             Touched,

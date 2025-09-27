@@ -8,7 +8,7 @@ namespace Divacon::Utils {
 
 namespace {
 
-static uint8_t getHidHat(const InputState::DPad dpad) {
+uint8_t getHidHat(const InputState::DPad dpad) {
     if (dpad.up && dpad.right) {
         return 0x01;
     }
@@ -372,7 +372,7 @@ void InputState::releaseAll() {
     touches = 0;
 }
 
-bool InputState::checkHotkey() {
+bool InputState::checkHotkey() const {
     static uint32_t hold_since = 0;
     static bool hold_active = false;
     static const uint32_t hold_timeout = 2000;

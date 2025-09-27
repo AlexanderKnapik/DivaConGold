@@ -32,7 +32,7 @@ queue_t led_queue;
 queue_t auth_challenge_queue;
 queue_t auth_signed_challenge_queue;
 
-enum class ControlCommand {
+enum class ControlCommand : uint8_t {
     SetUsbMode,
     SetPlayerLed,
     SetButtonLed,
@@ -208,9 +208,9 @@ int main() {
             led_message.at(led_message.size() - 1 - color_idx) =
                 Peripherals::TouchSliderLeds::TouchSliderLeds::Config::Color{
                     // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                    .r = frame[color_idx * 3 + 1],
-                    .g = frame[color_idx * 3],
-                    .b = frame[color_idx * 3 + 2],
+                    .r = frame[(color_idx * 3) + 1],
+                    .g = frame[(color_idx * 3)],
+                    .b = frame[(color_idx * 3) + 2],
                     // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
                 };
         }

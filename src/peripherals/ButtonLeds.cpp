@@ -20,15 +20,15 @@ void ButtonLeds::setEnablePdloaderSupport(bool do_enable) { m_enable_pdloader_su
 
 void ButtonLeds::setButtons(const Utils::InputState::Buttons &buttons) { m_buttons = buttons; }
 
-void ButtonLeds::update() {
+void ButtonLeds::update() const {
     if (m_raw_mode && m_enable_pdloader_support) {
         return;
     }
 
-    gpio_put(m_config.pins.north, !(m_config.invert ^ m_buttons.north));
-    gpio_put(m_config.pins.east, !(m_config.invert ^ m_buttons.east));
-    gpio_put(m_config.pins.south, !(m_config.invert ^ m_buttons.south));
-    gpio_put(m_config.pins.west, !(m_config.invert ^ m_buttons.west));
+    gpio_put(m_config.pins.north, m_config.invert ? m_buttons.north : !m_buttons.north);
+    gpio_put(m_config.pins.east, m_config.invert ? m_buttons.east : !m_buttons.east);
+    gpio_put(m_config.pins.south, m_config.invert ? m_buttons.south : !m_buttons.south);
+    gpio_put(m_config.pins.west, m_config.invert ? m_buttons.west : !m_buttons.west);
 }
 
 void ButtonLeds::update(const usb_button_led_t &raw) {
@@ -38,10 +38,10 @@ void ButtonLeds::update(const usb_button_led_t &raw) {
 
     m_raw_mode = true;
 
-    gpio_put(m_config.pins.north, m_config.invert ^ raw.north);
-    gpio_put(m_config.pins.east, m_config.invert ^ raw.east);
-    gpio_put(m_config.pins.south, m_config.invert ^ raw.south);
-    gpio_put(m_config.pins.west, m_config.invert ^ raw.west);
+    gpio_put(m_config.pins.north, m_config.invert ? !raw.north : raw.north);
+    gpio_put(m_config.pins.east, m_config.invert ? !raw.east : raw.east);
+    gpio_put(m_config.pins.south, m_config.invert ? !raw.south : raw.south);
+    gpio_put(m_config.pins.west, m_config.invert ? !raw.west : raw.west);
 }
 
 } // namespace Divacon::Peripherals

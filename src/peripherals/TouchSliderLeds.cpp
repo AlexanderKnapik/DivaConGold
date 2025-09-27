@@ -8,21 +8,21 @@
 namespace Divacon::Peripherals {
 
 namespace {
-const static uint32_t pulse_step_count = 4096;
-static const uint8_t pulse_dim_percent_min = 40;
-static const uint8_t pulse_dim_percent_max = 100;
+const uint32_t pulse_step_count = 4096;
+const uint8_t pulse_dim_percent_min = 40;
+const uint8_t pulse_dim_percent_max = 100;
 
-const static uint32_t rainbow_step_count = 4096;
+const uint32_t rainbow_step_count = 4096;
 
-const static uint32_t fade_step_count = 2048;
+const uint32_t fade_step_count = 2048;
 
-const static uint32_t blend_step_count = 128;
+const uint32_t blend_step_count = 128;
 
 // Use alternating frames to allow for smoother animation
-const static size_t rainbow_length = 40;
+const size_t rainbow_length = 40;
 
 // NOLINTBEGIN(modernize-use-designated-initializers)
-const static std::array<std::array<TouchSliderLeds::Config::Color, rainbow_length>, 2> rainbow_colors{{
+const std::array<std::array<TouchSliderLeds::Config::Color, rainbow_length>, 2> rainbow_colors{{
     {{
         {0x5a, 0x3a, 0xc6}, {0x76, 0x36, 0xaa}, {0x91, 0x34, 0x8e}, {0xad, 0x30, 0x72}, {0xca, 0x2e, 0x56},
         {0xe6, 0x2a, 0x3a}, {0xf2, 0x2f, 0x2b}, {0xe6, 0x42, 0x33}, {0xce, 0x5c, 0x46}, {0xb6, 0x74, 0x59},
@@ -169,7 +169,7 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
         break;
     case Config::TouchedMode::Touched:
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
-            if (m_touched & ((uint32_t)0x80000000 >> idx)) {
+            if ((m_touched & ((uint32_t)0x80000000 >> idx)) != 0) {
                 m_touched_buffer.at(idx) = m_config.touched_color;
             } else {
                 m_touched_buffer.at(idx) = {.r = 0x00, .g = 0x00, .b = 0x00};
@@ -180,7 +180,7 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
         const auto advance = fade_stepper.advance(steps);
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
-            if (m_touched & ((uint32_t)0x80000000 >> idx)) {
+            if ((m_touched & ((uint32_t)0x80000000 >> idx)) != 0) {
                 m_touched_buffer.at(idx) = m_config.touched_color;
                 fade_percent.at(idx) = 100;
             } else {
@@ -193,7 +193,7 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
         const auto advance = fade_stepper.advance(steps);
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
-            if (m_touched & ((uint32_t)0x80000000 >> idx)) {
+            if ((m_touched & ((uint32_t)0x80000000 >> idx)) != 0) {
                 m_touched_buffer.at(idx) = m_idle_buffer.at(idx);
                 fade_percent.at(idx) = 100;
             } else {
@@ -210,7 +210,7 @@ void TouchSliderLeds::render(uint32_t steps) {
     static uint8_t blend_percent = 100;
 
     const auto blend_advance = blend_stepper.advance(steps);
-    if (m_touched) {
+    if (m_touched != 0) {
         blend_percent = blend_advance > blend_percent ? 0 : blend_percent - blend_advance;
     } else {
         blend_percent = blend_advance + blend_percent > 100 ? 100 : blend_percent + blend_advance;

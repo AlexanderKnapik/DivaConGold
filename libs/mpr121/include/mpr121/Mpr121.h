@@ -5,7 +5,7 @@
 
 class Mpr121 {
   public:
-    enum class Register {
+    enum class Register : uint8_t {
         TOUCHSTATUS_L = 0x00,
         TOUCHSTATUS_H = 0x01,
         FILTDATA_0L = 0x04,

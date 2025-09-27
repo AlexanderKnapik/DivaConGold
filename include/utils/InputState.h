@@ -39,7 +39,6 @@ struct InputState {
         uint32_t touches;
     };
 
-  public:
     DPad dpad{};       // NOLINT
     Buttons buttons{}; // NOLINT
     struct {
@@ -85,7 +84,7 @@ struct InputState {
 
     void releaseAll();
 
-    bool checkHotkey();
+    [[nodiscard]] bool checkHotkey() const;
 };
 
 } // namespace Divacon::Utils

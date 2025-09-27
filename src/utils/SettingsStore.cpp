@@ -10,7 +10,9 @@ namespace Divacon::Utils {
 
 namespace {
 
-uint8_t read_byte(uint32_t offset) { return *(reinterpret_cast<uint8_t *>(XIP_BASE + offset)); }
+uint8_t read_byte(uint32_t offset) {
+    return *(reinterpret_cast<uint8_t *>(XIP_BASE + offset)); // NOLINT(performance-no-int-to-ptr)
+}
 
 } // namespace
 
@@ -39,7 +41,7 @@ SettingsStore::SettingsStore()
     }
 
     if (found_valid) {
-        m_store_cache = *(reinterpret_cast<Storecache *>(XIP_BASE + current_page));
+        m_store_cache = *(reinterpret_cast<Storecache *>(XIP_BASE + current_page)); // NOLINT(performance-no-int-to-ptr)
         m_dirty = false;
     }
 }
@@ -53,7 +55,7 @@ void SettingsStore::setUsbMode(usb_mode_t mode) {
     }
 }
 
-usb_mode_t SettingsStore::getUsbMode() { return m_store_cache.usb_mode; }
+usb_mode_t SettingsStore::getUsbMode() const { return m_store_cache.usb_mode; }
 
 void SettingsStore::setLedBrightness(uint8_t brightness) {
     if (m_store_cache.led_brightness != brightness) {
@@ -61,7 +63,7 @@ void SettingsStore::setLedBrightness(uint8_t brightness) {
         m_dirty = true;
     }
 }
-uint8_t SettingsStore::getLedBrightness() { return m_store_cache.led_brightness; }
+uint8_t SettingsStore::getLedBrightness() const { return m_store_cache.led_brightness; }
 
 void SettingsStore::setLedAnimationSpeed(uint8_t speed) {
     if (m_store_cache.led_animation_speed != speed) {
@@ -69,7 +71,7 @@ void SettingsStore::setLedAnimationSpeed(uint8_t speed) {
         m_dirty = true;
     }
 }
-uint8_t SettingsStore::getLedAnimationSpeed() { return m_store_cache.led_animation_speed; }
+uint8_t SettingsStore::getLedAnimationSpeed() const { return m_store_cache.led_animation_speed; }
 
 void SettingsStore::setLedIdleMode(Peripherals::TouchSliderLeds::Config::IdleMode mode) {
     if (m_store_cache.led_idle_mode != mode) {
@@ -77,7 +79,9 @@ void SettingsStore::setLedIdleMode(Peripherals::TouchSliderLeds::Config::IdleMod
         m_dirty = true;
     }
 }
-Peripherals::TouchSliderLeds::Config::IdleMode SettingsStore::getLedIdleMode() { return m_store_cache.led_idle_mode; }
+Peripherals::TouchSliderLeds::Config::IdleMode SettingsStore::getLedIdleMode() const {
+    return m_store_cache.led_idle_mode;
+}
 
 void SettingsStore::setLedTouchedMode(Peripherals::TouchSliderLeds::Config::TouchedMode mode) {
     if (m_store_cache.led_touched_mode != mode) {
@@ -85,7 +89,7 @@ void SettingsStore::setLedTouchedMode(Peripherals::TouchSliderLeds::Config::Touc
         m_dirty = true;
     }
 }
-Peripherals::TouchSliderLeds::Config::TouchedMode SettingsStore::getLedTouchedMode() {
+Peripherals::TouchSliderLeds::Config::TouchedMode SettingsStore::getLedTouchedMode() const {
     return m_store_cache.led_touched_mode;
 }
 
@@ -95,7 +99,9 @@ void SettingsStore::setLedIdleColor(Peripherals::TouchSliderLeds::Config::Color 
         m_dirty = true;
     }
 }
-Peripherals::TouchSliderLeds::Config::Color SettingsStore::getLedIdleColor() { return m_store_cache.led_idle_color; }
+Peripherals::TouchSliderLeds::Config::Color SettingsStore::getLedIdleColor() const {
+    return m_store_cache.led_idle_color;
+}
 
 void SettingsStore::setLedTouchedColor(Peripherals::TouchSliderLeds::Config::Color color) {
     if (m_store_cache.led_touched_color != color) {
@@ -103,7 +109,7 @@ void SettingsStore::setLedTouchedColor(Peripherals::TouchSliderLeds::Config::Col
         m_dirty = true;
     }
 }
-Peripherals::TouchSliderLeds::Config::Color SettingsStore::getLedTouchedColor() {
+Peripherals::TouchSliderLeds::Config::Color SettingsStore::getLedTouchedColor() const {
     return m_store_cache.led_touched_color;
 }
 
@@ -114,7 +120,7 @@ void SettingsStore::setLedEnablePlayerColor(bool do_enable) {
     }
 }
 
-bool SettingsStore::getLedEnablePlayerColor() { return m_store_cache.led_enable_player_color; };
+bool SettingsStore::getLedEnablePlayerColor() const { return m_store_cache.led_enable_player_color; };
 
 void SettingsStore::setLedEnablePdloaderSupport(bool do_enable) {
     if (m_store_cache.led_enable_pdloader_support != do_enable) {
@@ -123,7 +129,7 @@ void SettingsStore::setLedEnablePdloaderSupport(bool do_enable) {
     }
 }
 
-bool SettingsStore::getInputMirrorToDpad() { return m_store_cache.buttons_mirror_to_dpad; };
+bool SettingsStore::getInputMirrorToDpad() const { return m_store_cache.buttons_mirror_to_dpad; };
 void SettingsStore::setInputMirrorToDpad(bool do_mirror) {
     if (m_store_cache.buttons_mirror_to_dpad != do_mirror) {
         m_store_cache.buttons_mirror_to_dpad = do_mirror;
@@ -131,7 +137,7 @@ void SettingsStore::setInputMirrorToDpad(bool do_mirror) {
     }
 }
 
-bool SettingsStore::getLedEnablePdloaderSupport() { return m_store_cache.led_enable_pdloader_support; };
+bool SettingsStore::getLedEnablePdloaderSupport() const { return m_store_cache.led_enable_pdloader_support; };
 
 void SettingsStore::store() {
     if (m_dirty) {

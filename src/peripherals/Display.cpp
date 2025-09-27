@@ -166,7 +166,7 @@ std::string modeToString(usb_mode_t mode) {
     return "?";
 }
 
-static uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
+uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
     // Somewhat ugly gimmick to calculate the how often the face buttons
     // are pressed per minute.
     //
@@ -203,7 +203,7 @@ static uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
         };
 
         uint16_t avg() {
-            if (m_buf.size() > 0) {
+            if (!m_buf.empty()) {
                 return std::accumulate(m_buf.begin(), m_buf.end(), 0) / m_buf.size();
             }
             return 0;
@@ -274,7 +274,7 @@ void Display::drawIdleScreen() {
     // Player "LEDs"
     if (m_player_id != 0) {
         for (uint8_t i = 0; i < 4; ++i) {
-            if (m_player_id & (1 << i)) {
+            if ((m_player_id & (1 << i)) != 0) {
                 ssd1306_draw_square(&m_display, ((127) - ((4 - i) * 6)) - 1, 2, 4, 4);
             } else {
                 ssd1306_draw_square(&m_display, (127) - ((4 - i) * 6), 3, 2, 2);
@@ -285,7 +285,7 @@ void Display::drawIdleScreen() {
     // Slider state
     ssd1306_draw_line(&m_display, 0, 46, 128, 46);
     for (int i = 0; i < 32; ++i) {
-        if (m_touched & (1 << i)) {
+        if ((m_touched & (1 << i)) != 0) {
             ssd1306_draw_square(&m_display, (127 - 3) - (i * 4), 46, 3, 8);
         }
     }
@@ -334,7 +334,7 @@ void Display::drawMenuScreen() {
         selection = std::to_string(m_menu_state.selected_value);
         break;
     case Utils::Menu::Descriptor::Type::Toggle:
-        selection = m_menu_state.selected_value ? "On" : "Off";
+        selection = m_menu_state.selected_value == 0 ? "Off" : "On";
         break;
     }
     ssd1306_draw_string(&m_display, (127 - (selection.length() * 12)) / 2, 15, 2, selection.c_str());
