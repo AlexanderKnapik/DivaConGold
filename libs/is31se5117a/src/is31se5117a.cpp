@@ -2,12 +2,14 @@
 
 #include "pico/time.h"
 
+#include <array>
+
 namespace {
-static constexpr uint8_t KEY_COUNT = 16;
+constexpr uint8_t KEY_COUNT = 16;
 } // namespace
 
 Is31se5117a::Is31se5117a(uint8_t address, i2c_inst *i2c, uint8_t threshold, uint8_t hysteresis)
-    : m_i2c(i2c), m_address(address), m_current_page(RegisterPage::Page0) {
+    : m_i2c(i2c), m_address(address) {
 
     // Reset
     writeRegister(Register::MAIN_CONTROL, 0x80);
@@ -82,7 +84,7 @@ Is31se5117a::Is31se5117a(uint8_t address, i2c_inst *i2c, uint8_t threshold, uint
 }
 
 uint16_t Is31se5117a::getTouched() {
-    uint16_t touched = readRegister16(Register::KEY_STATUS_1);
+    const uint16_t touched = readRegister16(Register::KEY_STATUS_1);
 
     return touched;
 }
@@ -91,7 +93,7 @@ bool Is31se5117a::getTouched(uint8_t input) {
         return false;
     }
 
-    return getTouched() & (1 << input);
+    return (getTouched() & (1 << input)) != 0;
 }
 
 void Is31se5117a::setFingerThresholds(uint8_t threshold) {
@@ -163,21 +165,22 @@ uint16_t Is31se5117a::getBaseline(uint8_t input) {
 void Is31se5117a::setRegisterPage(uint16_t address) {
     if (address > 0x0009) {
         if (address > 0x00FF && m_current_page != RegisterPage::Page1) {
-            writeRegister(Register::SWITCH_PAGE, 0x01);
+            doWriteRegister(static_cast<uint8_t>(Register::SWITCH_PAGE), 0x01);
             m_current_page = RegisterPage::Page1;
         } else if (address < 0x0100 && m_current_page != RegisterPage::Page0) {
-            writeRegister(Register::SWITCH_PAGE, 0x00);
+            doWriteRegister(static_cast<uint8_t>(Register::SWITCH_PAGE), 0x00);
             m_current_page = RegisterPage::Page0;
         }
     }
 }
 
 uint8_t Is31se5117a::readRegister8(Is31se5117a::Register reg, uint8_t offset) {
-    uint8_t result;
-    uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
+    uint8_t result = 0;
+
+    const uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
+    const auto reg_addr = static_cast<uint8_t>(offset_addr & 0x00FF);
 
     setRegisterPage(offset_addr);
-    uint8_t reg_addr = static_cast<uint8_t>(offset_addr & 0x00FF);
 
     i2c_write_blocking(m_i2c, m_address, &reg_addr, 1, true);
     i2c_read_blocking(m_i2c, m_address, &result, 1, false);
@@ -186,24 +189,28 @@ uint8_t Is31se5117a::readRegister8(Is31se5117a::Register reg, uint8_t offset) {
 }
 
 uint16_t Is31se5117a::readRegister16(Is31se5117a::Register reg, uint8_t offset) {
-    uint8_t result[2];
-    uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
+    std::array<uint8_t, 2> result = {};
+
+    const uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
+    const auto reg_addr = static_cast<uint8_t>(offset_addr & 0x00FF);
 
     setRegisterPage(offset_addr);
-    uint8_t reg_addr = static_cast<uint8_t>(offset_addr & 0x00FF);
 
     i2c_write_blocking(m_i2c, m_address, &reg_addr, 1, true);
-    i2c_read_blocking(m_i2c, m_address, result, 2, false);
+    i2c_read_blocking(m_i2c, m_address, result.data(), 2, false);
 
     // High byte comes first for 16bit values
     return static_cast<uint16_t>(result[0]) << 8 | static_cast<uint16_t>(result[1]);
 }
 
 void Is31se5117a::writeRegister(Is31se5117a::Register reg, uint8_t value, uint8_t offset) {
-    uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
+    const uint16_t offset_addr = static_cast<uint16_t>(reg) + offset;
 
     setRegisterPage(offset_addr);
+    doWriteRegister(static_cast<uint8_t>(offset_addr & 0x00FF), value);
+}
 
-    uint8_t data[] = {static_cast<uint8_t>(offset_addr & 0x00FF), value};
-    i2c_write_blocking(m_i2c, m_address, data, 2, false);
+void Is31se5117a::doWriteRegister(uint8_t addr, uint8_t value) {
+    std::array data = {addr, value};
+    i2c_write_blocking(m_i2c, m_address, data.data(), 2, false);
 }

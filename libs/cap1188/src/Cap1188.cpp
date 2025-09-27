@@ -1,5 +1,8 @@
 #include "Cap1188.h"
 
+#include <algorithm>
+#include <array>
+
 Cap1188::Cap1188(uint8_t address, i2c_inst *i2c, uint8_t threshold, Sensitivity sensitivity, Gain gain)
     : m_i2c(i2c), m_address(address) {
 
@@ -50,7 +53,7 @@ bool Cap1188::getTouched(uint8_t input) {
         return false;
     }
 
-    return getTouched() & (1 << input);
+    return (getTouched() & (1 << input)) != 0;
 }
 
 void Cap1188::setGain(Gain gain) {
@@ -70,19 +73,17 @@ void Cap1188::setSensitivity(Cap1188::Sensitivity sensitivity) {
 
 void Cap1188::setThreshold(uint8_t threshold) {
     // By default writing SENSOR_INPUT_1_THRESHOLD will set all inputs
-    if (threshold > 127) {
-        threshold = 127;
-    }
+    threshold = std::min(threshold, (uint8_t)127);
 
     writeRegister(Register::SENSOR_INPUT_1_THRESHOLD, threshold);
 }
 
 int8_t Cap1188::getDeltaCount(uint8_t input) {
     if (input > 7) {
-        return false;
+        return 0;
     }
 
-    return readRegister(Register::SENSOR_INPUT_1_DELTA_COUNT, input);
+    return static_cast<int8_t>(readRegister(Register::SENSOR_INPUT_1_DELTA_COUNT, input));
 }
 
 void Cap1188::clearInterrupt() {
@@ -92,7 +93,7 @@ void Cap1188::clearInterrupt() {
 }
 
 uint8_t Cap1188::readRegister(Cap1188::Register reg, uint8_t offset) {
-    uint8_t result;
+    uint8_t result = 0;
     const uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
 
     i2c_write_blocking(m_i2c, m_address, &reg_addr, 1, true);
@@ -103,7 +104,7 @@ uint8_t Cap1188::readRegister(Cap1188::Register reg, uint8_t offset) {
 
 void Cap1188::writeRegister(Cap1188::Register reg, uint8_t value, uint8_t offset) {
     const uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
-    const uint8_t data[] = {reg_addr, value};
+    const std::array data = {reg_addr, value};
 
-    i2c_write_blocking(m_i2c, m_address, data, 2, false);
+    i2c_write_blocking(m_i2c, m_address, data.data(), 2, false);
 }

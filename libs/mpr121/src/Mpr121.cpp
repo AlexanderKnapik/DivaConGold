@@ -2,6 +2,8 @@
 
 #include "pico/time.h"
 
+#include <array>
+
 Mpr121::Mpr121(uint8_t address, i2c_inst *i2c, uint8_t touch_threshold, uint8_t release_threshold, bool autoconfig)
     : m_i2c(i2c), m_address(address) {
 
@@ -47,7 +49,7 @@ Mpr121::Mpr121(uint8_t address, i2c_inst *i2c, uint8_t touch_threshold, uint8_t 
 }
 
 uint16_t Mpr121::getTouched() {
-    uint16_t touched = readRegister16(Register::TOUCHSTATUS_L);
+    const uint16_t touched = readRegister16(Register::TOUCHSTATUS_L);
 
     return touched & 0x0FFF;
 }
@@ -56,7 +58,7 @@ bool Mpr121::getTouched(uint8_t input) {
         return false;
     }
 
-    return getTouched() & (1 << input);
+    return (getTouched() & (1 << input)) != 0;
 }
 
 void Mpr121::setThresholds(uint8_t touch_threshold, uint8_t release_threshold) {
@@ -86,9 +88,9 @@ uint16_t Mpr121::getFilteredData(uint8_t input) {
 }
 
 uint8_t Mpr121::readRegister8(Mpr121::Register reg, uint8_t offset) {
-    uint8_t result;
+    uint8_t result = 0;
 
-    uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
+    const uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
     i2c_write_blocking(m_i2c, m_address, &reg_addr, 1, true);
     i2c_read_blocking(m_i2c, m_address, &result, 1, false);
 
@@ -96,30 +98,30 @@ uint8_t Mpr121::readRegister8(Mpr121::Register reg, uint8_t offset) {
 }
 
 uint16_t Mpr121::readRegister16(Mpr121::Register reg, uint8_t offset) {
-    uint8_t result[2];
+    std::array<uint8_t, 2> result = {};
 
-    uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
+    const uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
     i2c_write_blocking(m_i2c, m_address, &reg_addr, 1, true);
-    i2c_read_blocking(m_i2c, m_address, result, 2, false);
+    i2c_read_blocking(m_i2c, m_address, result.data(), 2, false);
 
     return static_cast<uint16_t>(result[1]) << 8 | static_cast<uint16_t>(result[0]);
 }
 
 void Mpr121::writeRegister(Mpr121::Register reg, uint8_t value, uint8_t offset) {
     // Only ECR and GPIO related registers can be written in 'Run' mode.
-    bool need_stop = (reg != Register::ECR) && (reg != Register::GPIODIR) && (reg != Register::GPIOEN) &&
-                     (reg != Register::GPIOSET) && (reg != Register::GPIOCLR) && (reg != Register::GPIOTOGGLE);
+    const bool need_stop = (reg != Register::ECR) && (reg != Register::GPIODIR) && (reg != Register::GPIOEN) &&
+                           (reg != Register::GPIOSET) && (reg != Register::GPIOCLR) && (reg != Register::GPIOTOGGLE);
 
     auto do_write_register = [&](Mpr121::Register reg, uint8_t value, uint8_t offset = 0) {
-        uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
-        uint8_t data[] = {reg_addr, value};
+        const uint8_t reg_addr = static_cast<uint8_t>(reg) + offset;
+        std::array data = {reg_addr, value};
 
-        i2c_write_blocking(m_i2c, m_address, data, 2, false);
+        i2c_write_blocking(m_i2c, m_address, data.data(), 2, false);
     };
 
     if (need_stop) {
         // Backup ECR
-        uint8_t ecr = readRegister8(Register::ECR);
+        const uint8_t ecr = readRegister8(Register::ECR);
 
         // Issue stop
         do_write_register(Register::ECR, 0x00);

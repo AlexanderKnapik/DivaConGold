@@ -300,7 +300,7 @@ class Is31se5117a {
     i2c_inst *m_i2c;
     uint8_t m_address;
 
-    RegisterPage m_current_page;
+    RegisterPage m_current_page{RegisterPage::Page0};
 
   public:
     Is31se5117a(uint8_t address, i2c_inst *i2c, uint8_t threshold, uint8_t hysteresis);
@@ -327,6 +327,8 @@ class Is31se5117a {
     uint8_t readRegister8(Register reg, uint8_t offset = 0);
     uint16_t readRegister16(Register reg, uint8_t offset = 0);
     void writeRegister(Register reg, uint8_t value, uint8_t offset = 0);
+
+    void doWriteRegister(uint8_t addr, uint8_t value);
 };
 
 #endif // IS31SE5117A_IS31SE5117A_H_
