@@ -10,7 +10,7 @@
 #include "usb/device/vendor/xinput_driver.h"
 #include "usb/device_driver.h"
 
-#include <stdint.h>
+#include <cstdint>
 #include <string>
 
 namespace Divacon::Utils {
@@ -29,7 +29,7 @@ struct InputState {
     };
 
     struct AnalogStick {
-        const static uint8_t center = 0x80;
+        const static uint8_t CENTER = 0x80;
 
         uint8_t x, y;
     };
@@ -43,8 +43,8 @@ struct InputState {
     DPad dpad;
     Buttons buttons;
     struct {
-        AnalogStick left = {AnalogStick::center, AnalogStick::center};
-        AnalogStick right = {AnalogStick::center, AnalogStick::center};
+        AnalogStick left = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
+        AnalogStick right = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
     } sticks;
     uint32_t touches;
 
@@ -55,7 +55,17 @@ struct InputState {
     hid_nkro_keyboard_report_t m_keyboard_report;
     xinput_report_t m_xinput_report;
     pdloader_report_t m_pdloader_report;
-    midi_report_t m_midi_report;
+    midi_report_t m_midi_report{
+        .kick = false,
+        .snare = false,
+        .hihat_closed = false,
+        .hihat_open = false,
+        .shift = 60,
+        .touched = 0,
+        .pitch_bend = 64,
+        .damper = false,
+        .portamento = false,
+    };
     std::string m_debug_report;
 
     usb_report_t getSwitchReport();
@@ -68,7 +78,7 @@ struct InputState {
     usb_report_t getDebugReport();
 
   public:
-    InputState();
+    InputState() = default;
 
     usb_report_t getReport(usb_mode_t mode);
     InputMessage getInputMessage();

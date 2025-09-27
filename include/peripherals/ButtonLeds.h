@@ -24,7 +24,7 @@ class ButtonLeds {
     bool m_enable_pdloader_support;
 
     Utils::InputState::Buttons m_buttons;
-    bool m_raw_mode;
+    bool m_raw_mode{false};
 
   public:
     ButtonLeds(const Config &config, bool enable_pdloader_support);

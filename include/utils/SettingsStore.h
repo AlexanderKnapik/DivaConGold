@@ -29,12 +29,13 @@ class SettingsStore {
         bool led_enable_pdloader_support;
         bool buttons_mirror_to_dpad;
 
-        uint8_t _padding[m_store_size - sizeof(uint8_t) - sizeof(usb_mode_t) - sizeof(uint8_t) - sizeof(uint8_t) -
-                         sizeof(Peripherals::TouchSliderLeds::Config::IdleMode) -
-                         sizeof(Peripherals::TouchSliderLeds::Config::TouchedMode) -
-                         sizeof(Peripherals::TouchSliderLeds::Config::Color) -
-                         sizeof(Peripherals::TouchSliderLeds::Config::Color) - sizeof(bool) - sizeof(bool) -
-                         sizeof(bool)];
+        std::array<uint8_t, m_store_size - sizeof(uint8_t) - sizeof(usb_mode_t) - sizeof(uint8_t) - sizeof(uint8_t) -
+                                sizeof(Peripherals::TouchSliderLeds::Config::IdleMode) -
+                                sizeof(Peripherals::TouchSliderLeds::Config::TouchedMode) -
+                                sizeof(Peripherals::TouchSliderLeds::Config::Color) -
+                                sizeof(Peripherals::TouchSliderLeds::Config::Color) - sizeof(bool) - sizeof(bool) -
+                                sizeof(bool)>
+            _padding;
     };
     static_assert(sizeof(Storecache) == m_store_size);
 
@@ -45,9 +46,9 @@ class SettingsStore {
     };
 
     Storecache m_store_cache;
-    bool m_dirty;
+    bool m_dirty{true};
 
-    RebootType m_scheduled_reboot;
+    RebootType m_scheduled_reboot{RebootType::None};
 
   private:
     Storecache read();

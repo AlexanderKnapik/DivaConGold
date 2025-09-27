@@ -15,101 +15,104 @@ namespace Divacon::Config::Default {
 const usb_mode_t usb_mode = USB_MODE_SWITCH_DIVACON;
 
 const Peripherals::Buttons::Config buttons_config = {
-    {
-        // Pin config
+    .pins =
         {
-            // Dpad
-            18, // Up
-            19, // Down
-            20, // Left
-            21, // Right
+            .dpad =
+                {
+                    .up = 18,
+                    .down = 19,
+                    .left = 20,
+                    .right = 21,
+                },
+            .buttons =
+                {
+                    .north = 6,
+                    .east = 9,
+                    .south = 8,
+                    .west = 7,
+
+                    .l1 = 0,
+                    .l2 = 1,
+                    .l3 = 2,
+
+                    .r1 = 3,
+                    .r2 = 4,
+                    .r3 = 5,
+
+                    .start = 26,
+                    .select = 27,
+                    .home = 22,
+                },
         },
-        {
-            // Buttons
-            6, // North
-            9, // East
-            8, // South
-            7, // West
-
-            0, // L1
-            1, // L2
-            2, // L3
-
-            3, // R1
-            4, // R2
-            5, // R3
-
-            26, // Start
-            27, // Select
-            22, // Home
-        },
-    },
-    false, // Mirror face buttons to DPad
-    3,     // Debounce delay in milliseconds
+    .mirror_to_dpad = false,
+    .debounce_delay_ms = 3,
 };
 
 const Peripherals::ButtonLeds::Config button_leds_config = {
-    // Pin config
-    {
-        10, // North
-        13, // East
-        12, // South
-        11, // West
-    },
-    false, // Invert
+    .pins =
+        {
+            .north = 10,
+            .east = 13,
+            .south = 12,
+            .west = 11,
+        },
+    .invert = false,
 };
 
 const Peripherals::TouchSlider::Config touch_slider_config = {
-    16,     // SDA Pin
-    17,     // SCL Pin
-    i2c0,   // I2C Block
-    800000, // I2C Speed
+    .sda_pin = 16,
+    .scl_pin = 17,
+    .i2c_block = i2c0,
+    .i2c_speed_hz = 800000,
 
     //
     // Touch controller config, either Mpr121x3, Mpr121x4 or Cap1188
     //
 
-    // Peripherals::TouchSlider::Config::Mpr121x3 {
-    //     {0x5A, 0x5D, 0x5C}, // MPR121 Addresses
-    //     12,                 // Touch threshold
-    //     6,                  // Release threshold
-    // },
+    // .touch_config =
+    //     Peripherals::TouchSlider::Config::Mpr121x3{
+    //         .i2c_addresses = {0x5A, 0x5D, 0x5C},
+    //         .touch_threshold = 12,
+    //         .release_threshold = 6,
+    //     },
 
-    Peripherals::TouchSlider::Config::Mpr121x4{
-        {0x5A, 0x5B, 0x5C, 0x5D}, // MPR121 Addresses
-        12,                       // Touch threshold
-        6,                        // Release threshold
-    },
+    .touch_config =
+        Peripherals::TouchSlider::Config::Mpr121x4{
+            .i2c_addresses = {0x5A, 0x5B, 0x5C, 0x5D},
+            .touch_threshold = 12,
+            .release_threshold = 6,
+        },
 
-    // Peripherals::TouchSlider::Config::Cap1188{
-    //     {0x2C, 0x2B, 0x2A, 0x29},  // CAP1188 Addresses
-    //     64,                        // Touch threshold
-    //     Cap1188::Sensitivity::S32, // Sensitivity
-    // },
+    // .touch_config =
+    //     Peripherals::TouchSlider::Config::Cap1188{
+    //         .i2c_addresses = {0x2C, 0x2B, 0x2A, 0x29},
+    //         .threshold = 64,
+    //         .sensitivity = Cap1188::Sensitivity::S32,
+    //     },
 };
 
 const Peripherals::TouchSliderLeds::Config touch_slider_leds_config = {
-    28,    // LED Pin
-    false, // Is RGBW strip
-    true,  // Reverse LED order
-    2,     // LEDs per segment
+    .led_pin = 28,
+    .is_rgbw = false,
+    .reverse = true,
+    .leds_per_segment = 2,
 
-    128,                                                            // Brightness
-    128,                                                            // Animation speed
-    Peripherals::TouchSliderLeds::Config::IdleMode::Pulse,          // Idle Mode
-    Peripherals::TouchSliderLeds::Config::TouchedMode::TouchedFade, // Touched Mode
-    {64, 64, 64},                                                   // Background color
-    {138, 254, 171},                                                // Touched color
-    true,                                                           // Enable Player Color as Idle Color (DS4 only)
-    true,                                                           // Enable LED control from PDLoader (PDLoader only)
+    .brightness = 128,
+    .animation_speed = 128,
+    .idle_mode = Peripherals::TouchSliderLeds::Config::IdleMode::Pulse,
+    .touched_mode = Peripherals::TouchSliderLeds::Config::TouchedMode::TouchedFade,
+    .idle_color = {.r = 64, .g = 64, .b = 64},
+    .touched_color = {.r = 138, .g = 254, .b = 171},
+    .enable_player_color = true,
+    .enable_pdloader_support = true,
 };
 
 const Peripherals::Display::Config display_config = {
-    14,      // SDA Pin
-    15,      // SCL Pin
-    i2c1,    // I2C Block
-    1000000, // I2C Speed
-    0x3C,    // I2C Address
+    .sda_pin = 14,
+    .scl_pin = 15,
+    .i2c_block = i2c1,
+    .i2c_speed_hz = 1000000,
+    .i2c_address = 0x3C,
 };
 
 } // namespace Divacon::Config::Default

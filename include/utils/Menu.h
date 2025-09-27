@@ -116,7 +116,7 @@ class Menu {
 
   private:
     std::shared_ptr<SettingsStore> m_store;
-    bool m_active;
+    bool m_active{false};
     std::stack<State> m_state_stack;
 
     uint8_t getCurrentValue(Page page);

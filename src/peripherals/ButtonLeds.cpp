@@ -5,7 +5,7 @@
 namespace Divacon::Peripherals {
 
 ButtonLeds::ButtonLeds(const Config &config, bool enable_pdloader_support)
-    : m_config(config), m_enable_pdloader_support(enable_pdloader_support), m_buttons({}), m_raw_mode(false) {
+    : m_config(config), m_enable_pdloader_support(enable_pdloader_support) {
     uint button_mask = 0                          //
                        | 1 << m_config.pins.north //
                        | 1 << m_config.pins.east  //

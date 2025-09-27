@@ -3,8 +3,8 @@
 
 #include <algorithm>
 #include <array>
+#include <cstdint>
 #include <optional>
-#include <stdint.h>
 #include <vector>
 
 namespace Divacon::Peripherals {
@@ -16,12 +16,12 @@ class TouchSliderLeds {
   public:
     struct Config {
         struct Color {
-            bool operator==(const Color &rhs) const { return (r == rhs.r) && (g == rhs.g) && (b == rhs.b); }
-            bool operator!=(const Color &rhs) const { return !operator==(rhs); }
-
             uint8_t r;
             uint8_t g;
             uint8_t b;
+
+            bool operator==(const Color &) const = default;
+            bool operator!=(const Color &) const = default;
         };
 
         enum class IdleMode {
@@ -60,7 +60,7 @@ class TouchSliderLeds {
 
   private:
     Config m_config;
-    uint32_t m_touched;
+    uint32_t m_touched{0};
 
     std::vector<uint32_t> m_rendered_frame;
 
@@ -69,7 +69,7 @@ class TouchSliderLeds {
 
     std::optional<Config::Color> m_player_color;
 
-    bool m_raw_mode;
+    bool m_raw_mode{false};
 
     void updateIdle(uint32_t steps);
     void updateTouched(uint32_t steps);

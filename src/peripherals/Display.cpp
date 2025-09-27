@@ -136,10 +136,7 @@ static const std::array<uint8_t, 1154> menu_screen_top = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-Display::Display(const Config &config)
-    : m_config(config), m_state(State::Idle), m_touched(0), m_buttons({}), m_usb_mode(USB_MODE_DEBUG), m_player_id(0),
-      m_menu_state({Utils::Menu::Page::Main, 0, 0}) {
-
+Display::Display(const Config &config) : m_config(config) {
     i2c_init(m_config.i2c_block, m_config.i2c_speed_hz);
     gpio_set_function(m_config.sda_pin, GPIO_FUNC_I2C);
     gpio_set_function(m_config.scl_pin, GPIO_FUNC_I2C);

@@ -11,19 +11,18 @@ namespace Divacon::Utils {
 static uint8_t read_byte(uint32_t offset) { return *(reinterpret_cast<uint8_t *>(XIP_BASE + offset)); }
 
 SettingsStore::SettingsStore()
-    : m_store_cache({m_magic_byte,
-                     Config::Default::usb_mode,
-                     Config::Default::touch_slider_leds_config.brightness,
-                     Config::Default::touch_slider_leds_config.animation_speed,
-                     Config::Default::touch_slider_leds_config.idle_mode,
-                     Config::Default::touch_slider_leds_config.touched_mode,
-                     Config::Default::touch_slider_leds_config.idle_color,
-                     Config::Default::touch_slider_leds_config.touched_color,
-                     Config::Default::touch_slider_leds_config.enable_player_color,
-                     Config::Default::touch_slider_leds_config.enable_pdloader_support,
-                     Config::Default::buttons_config.mirror_to_dpad,
-                     {}}),
-      m_dirty(true), m_scheduled_reboot(RebootType::None) {
+    : m_store_cache({.in_use = m_magic_byte,
+                     .usb_mode = Config::Default::usb_mode,
+                     .led_brightness = Config::Default::touch_slider_leds_config.brightness,
+                     .led_animation_speed = Config::Default::touch_slider_leds_config.animation_speed,
+                     .led_idle_mode = Config::Default::touch_slider_leds_config.idle_mode,
+                     .led_touched_mode = Config::Default::touch_slider_leds_config.touched_mode,
+                     .led_idle_color = Config::Default::touch_slider_leds_config.idle_color,
+                     .led_touched_color = Config::Default::touch_slider_leds_config.touched_color,
+                     .led_enable_player_color = Config::Default::touch_slider_leds_config.enable_player_color,
+                     .led_enable_pdloader_support = Config::Default::touch_slider_leds_config.enable_pdloader_support,
+                     .buttons_mirror_to_dpad = Config::Default::buttons_config.mirror_to_dpad,
+                     ._padding = {}}) {
 
     uint32_t current_page = m_flash_offset + m_flash_size - m_store_size;
     bool found_valid = false;

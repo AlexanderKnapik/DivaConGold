@@ -105,7 +105,7 @@ uint32_t TouchSlider::TouchControllerIs31se5117a::read() {
     return ((reverseBits(m_is31se5117a[0]->getTouched()) << 16) | reverseBits(m_is31se5117a[1]->getTouched()));
 }
 
-TouchSlider::TouchSlider(const Config &config, usb_mode_t mode) : m_config(config), m_mode(mode), m_touched(0) {
+TouchSlider::TouchSlider(const Config &config, usb_mode_t mode) : m_config(config), m_mode(mode) {
     gpio_set_function(m_config.sda_pin, GPIO_FUNC_I2C);
     gpio_set_function(m_config.scl_pin, GPIO_FUNC_I2C);
     gpio_pull_up(m_config.sda_pin);
@@ -135,10 +135,10 @@ TouchSlider::TouchSlider(const Config &config, usb_mode_t mode) : m_config(confi
 void TouchSlider::updateInputStateArcade(Utils::InputState &input_state) {
     // The 32bit state vector is mapped into the 4 8bit axes of the analog sticks, XORed
     // with the stick center postion to ensure no stick movement when the slider is not touched.
-    input_state.sticks.right.y = (uint8_t)((m_touched & 0xFF000000) >> 24) ^ Utils::InputState::AnalogStick::center;
-    input_state.sticks.right.x = (uint8_t)((m_touched & 0x00FF0000) >> 16) ^ Utils::InputState::AnalogStick::center;
-    input_state.sticks.left.y = (uint8_t)((m_touched & 0x0000FF00) >> 8) ^ Utils::InputState::AnalogStick::center;
-    input_state.sticks.left.x = (uint8_t)((m_touched & 0x000000FF)) ^ Utils::InputState::AnalogStick::center;
+    input_state.sticks.right.y = (uint8_t)((m_touched & 0xFF000000) >> 24) ^ Utils::InputState::AnalogStick::CENTER;
+    input_state.sticks.right.x = (uint8_t)((m_touched & 0x00FF0000) >> 16) ^ Utils::InputState::AnalogStick::CENTER;
+    input_state.sticks.left.y = (uint8_t)((m_touched & 0x0000FF00) >> 8) ^ Utils::InputState::AnalogStick::CENTER;
+    input_state.sticks.left.x = (uint8_t)((m_touched & 0x000000FF)) ^ Utils::InputState::AnalogStick::CENTER;
 }
 
 void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
@@ -148,8 +148,10 @@ void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
         uint8_t x_axis;
     };
 
-    static State previous_left = {0, UINT8_MAX, Utils::InputState::AnalogStick::center};
-    static State previous_right = {0, UINT8_MAX, Utils::InputState::AnalogStick::center};
+    static State previous_left = {
+        .left_limit = 0, .right_limit = UINT8_MAX, .x_axis = Utils::InputState::AnalogStick::CENTER};
+    static State previous_right = {
+        .left_limit = 0, .right_limit = UINT8_MAX, .x_axis = Utils::InputState::AnalogStick::CENTER};
 
     auto handleSide = [](uint16_t touched, State &previous_state, uint8_t &target) {
         if (touched != 0) {
@@ -190,7 +192,7 @@ void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
             // No touch, reset
             previous_state.left_limit = 0;
             previous_state.right_limit = UINT8_MAX;
-            target = Utils::InputState::AnalogStick::center;
+            target = Utils::InputState::AnalogStick::CENTER;
         }
         previous_state.x_axis = target;
     };
@@ -200,8 +202,8 @@ void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
     handleSide(m_touched >> 16, previous_left, input_state.sticks.left.x);
     handleSide(m_touched & 0x0000FFFF, previous_right, input_state.sticks.right.x);
 
-    input_state.sticks.left.y = Utils::InputState::AnalogStick::center;
-    input_state.sticks.right.y = Utils::InputState::AnalogStick::center;
+    input_state.sticks.left.y = Utils::InputState::AnalogStick::CENTER;
+    input_state.sticks.right.y = Utils::InputState::AnalogStick::CENTER;
 }
 
 void TouchSlider::updateInputState(Utils::InputState &input_state) {

@@ -5,10 +5,10 @@
 
 namespace Divacon::Config::PS4Auth {
 
-const Utils::PS4AuthProvider::Config config = {false,        // Enabled
-                                               {},           // Serial
-                                               {},           // Signature
-                                               R"pem()pem"}; // Pem
+const Utils::PS4AuthProvider::Config config = {.enabled = false,        // Enabled
+                                               .serial = {},            // Serial
+                                               .signature = {},         // Signature
+                                               .key_pem = R"pem()pem"}; // Pem
 
 } // namespace Divacon::Config::PS4Auth
 

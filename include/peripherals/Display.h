@@ -9,8 +9,8 @@
 
 #include "hardware/i2c.h"
 
+#include <cstdint>
 #include <memory>
-#include <stdint.h>
 
 namespace Divacon::Peripherals {
 

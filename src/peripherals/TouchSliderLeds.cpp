@@ -20,6 +20,8 @@ const static uint32_t blend_step_count = 128;
 
 // Use alternating frames to allow for smoother animation
 const static size_t rainbow_length = 40;
+
+// NOLINTBEGIN(modernize-use-designated-initializers)
 const static std::array<std::array<TouchSliderLeds::Config::Color, rainbow_length>, 2> rainbow_colors{{
     {{
         {0x5a, 0x3a, 0xc6}, {0x76, 0x36, 0xaa}, {0x91, 0x34, 0x8e}, {0xad, 0x30, 0x72}, {0xca, 0x2e, 0x56},
@@ -42,6 +44,7 @@ const static std::array<std::array<TouchSliderLeds::Config::Color, rainbow_lengt
         {0x64, 0x48, 0xca}, {0x48, 0x45, 0xe0}, {0x2c, 0x42, 0xf6}, {0x2f, 0x3e, 0xf0}, {0x4c, 0x3b, 0xd4},
     }},
 }};
+// NOLINTEND(modernize-use-designated-initializers)
 
 struct AnimationStepper {
     const uint32_t steps_to_advance;
@@ -80,9 +83,7 @@ TouchSliderLeds::Config::Color max_color(const TouchSliderLeds::Config::Color &a
 
 } // namespace
 
-TouchSliderLeds::TouchSliderLeds(const Config &config)
-    : m_config(config), m_touched(0), m_idle_buffer({}), m_touched_buffer({}), m_player_color(std::nullopt),
-      m_raw_mode(false) {
+TouchSliderLeds::TouchSliderLeds(const Config &config) : m_config(config) {
     m_rendered_frame = std::vector<uint32_t>(32 * config.leds_per_segment, ws2812_rgb_to_u32pixel(0, 0, 0));
 
     ws2812_init(config.led_pin, m_config.is_rgbw);
@@ -102,12 +103,12 @@ void TouchSliderLeds::setPlayerColor(const TouchSliderLeds::Config::Color &color
 
 void TouchSliderLeds::updateIdle(uint32_t steps) {
     // Pulse
-    static AnimationStepper pulse_stepper{pulse_step_count, 0};
+    static AnimationStepper pulse_stepper{.steps_to_advance = pulse_step_count, .current_steps = 0};
     static uint8_t pulse_dim_percent = pulse_dim_percent_max;
     static int8_t pulse_advance_factor = -1;
 
     // Rainbow
-    static AnimationStepper rainbow_stepper{rainbow_step_count, 0};
+    static AnimationStepper rainbow_stepper{.steps_to_advance = rainbow_step_count, .current_steps = 0};
     static size_t rainbow_position = get_rand_32() % rainbow_length;
 
     if (steps <= 0) {
@@ -120,7 +121,7 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
 
     switch (m_config.idle_mode) {
     case Config::IdleMode::Off:
-        m_idle_buffer.fill({0x00, 0x00, 0x00});
+        m_idle_buffer.fill({.r = 0x00, .g = 0x00, .b = 0x00});
         break;
     case Config::IdleMode::Static:
         m_idle_buffer.fill(idle_color);
@@ -156,22 +157,22 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
     }
 }
 void TouchSliderLeds::updateTouched(uint32_t steps) {
-    static AnimationStepper fade_stepper{fade_step_count, 0};
+    static AnimationStepper fade_stepper{.steps_to_advance = fade_step_count, .current_steps = 0};
     static std::array<uint8_t, SEGMENT_COUNT> fade_percent = {};
 
     switch (m_config.touched_mode) {
     case Config::TouchedMode::Off:
-        m_touched_buffer.fill({0x00, 0x00, 0x00});
+        m_touched_buffer.fill({.r = 0x00, .g = 0x00, .b = 0x00});
         break;
     case Config::TouchedMode::Idle:
-        std::copy(m_idle_buffer.cbegin(), m_idle_buffer.cend(), m_touched_buffer.begin());
+        std::ranges::copy(m_idle_buffer, m_touched_buffer.begin());
         break;
     case Config::TouchedMode::Touched:
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if (m_touched & ((uint32_t)0x80000000 >> idx)) {
                 m_touched_buffer[idx] = m_config.touched_color;
             } else {
-                m_touched_buffer[idx] = {0x00, 0x00, 0x00};
+                m_touched_buffer[idx] = {.r = 0x00, .g = 0x00, .b = 0x00};
             }
         }
         break;
@@ -205,7 +206,7 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
 }
 
 void TouchSliderLeds::render(uint32_t steps) {
-    static AnimationStepper blend_stepper{blend_step_count, 0};
+    static AnimationStepper blend_stepper{.steps_to_advance = blend_step_count, .current_steps = 0};
     static uint8_t blend_percent = 100;
 
     const auto blend_advance = blend_stepper.advance(steps);
@@ -262,9 +263,9 @@ void TouchSliderLeds::update(const TouchSliderLeds::RawFrameMessage &frame) {
 
     size_t idx = 0;
     for (const auto &color : frame) {
-        for (int led = 0; led < m_config.leds_per_segment; ++led) {
+        for (uint16_t led = 0; led < m_config.leds_per_segment; ++led) {
             // Allow limiting max brightness to stay within USB power restrictions.
-            uint8_t color_max = std::max(color.r, std::max(color.g, color.b));
+            uint8_t color_max = std::max({color.r, color.g, color.b});
             if (color_max > m_config.brightness) {
                 float dim_factor = (float)m_config.brightness / (float)color_max;
                 m_rendered_frame.at((idx * m_config.leds_per_segment) + led) = ws2812_rgb_to_u32pixel(

@@ -6,14 +6,6 @@
 
 namespace Divacon::Utils {
 
-InputState::InputState()
-    : dpad({false, false, false, false}),                                                                   //
-      buttons({false, false, false, false, false, false, false, false, false, false, false, false, false}), //
-      sticks({{AnalogStick::center, AnalogStick::center}, {AnalogStick::center, AnalogStick::center}}),     //
-      touches(0), m_switch_report({}), m_ps3_report({}), m_ps4_report({}), m_keyboard_report({}),
-      m_xinput_report({0x00, sizeof(xinput_report_t), 0, 0, 0, 0, 0, 0, 0, 0, {}}), m_pdloader_report({}),
-      m_midi_report({false, false, false, false, 60, 0, 64, false, false}) {}
-
 usb_report_t InputState::getReport(usb_mode_t mode) {
     switch (mode) {
     case USB_MODE_SWITCH_DIVACON:
@@ -39,7 +31,7 @@ usb_report_t InputState::getReport(usb_mode_t mode) {
     }
 }
 
-InputState::InputMessage InputState::getInputMessage() { return {buttons, touches}; }
+InputState::InputMessage InputState::getInputMessage() { return {.buttons = buttons, .touches = touches}; }
 
 static uint8_t getHidHat(const InputState::DPad dpad) {
     if (dpad.up && dpad.right) {
@@ -189,6 +181,8 @@ usb_report_t InputState::getPS4InputReport() {
 }
 
 usb_report_t InputState::getXinputReport() {
+    m_xinput_report.report_size = sizeof(xinput_report_t);
+
     m_xinput_report.buttons1 = 0                                 //
                                | (dpad.up ? (1 << 0) : 0)        //
                                | (dpad.down ? (1 << 1) : 0)      //
@@ -286,10 +280,10 @@ usb_report_t InputState::getKeyboardReport() {
     set_key(buttons.select, HID_KEY_F1);
     set_key(buttons.home, HID_KEY_ESCAPE);
 
-    set_key(sticks.left.x < AnalogStick::center, HID_KEY_Q);
-    set_key(sticks.left.x > AnalogStick::center, HID_KEY_E);
-    set_key(sticks.right.x < AnalogStick::center, HID_KEY_U);
-    set_key(sticks.right.x > AnalogStick::center, HID_KEY_O);
+    set_key(sticks.left.x < AnalogStick::CENTER, HID_KEY_Q);
+    set_key(sticks.left.x > AnalogStick::CENTER, HID_KEY_E);
+    set_key(sticks.right.x < AnalogStick::CENTER, HID_KEY_U);
+    set_key(sticks.right.x > AnalogStick::CENTER, HID_KEY_O);
 
     return {(uint8_t *)&m_keyboard_report, sizeof(hid_nkro_keyboard_report_t)};
 }
@@ -361,9 +355,9 @@ usb_report_t InputState::getDebugReport() {
 }
 
 void InputState::releaseAll() {
-    dpad = {false, false, false, false};
-    buttons = {false, false, false, false, false, false, false, false, false, false, false, false, false};
-    sticks = {{AnalogStick::center, AnalogStick::center}, {AnalogStick::center, AnalogStick::center}};
+    dpad = {};
+    buttons = {};
+    sticks = {};
     touches = 0;
 }
 

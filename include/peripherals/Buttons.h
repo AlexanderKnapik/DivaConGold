@@ -3,8 +3,8 @@
 
 #include "utils/InputState.h"
 
+#include <cstdint>
 #include <map>
-#include <stdint.h>
 
 namespace Divacon::Peripherals {
 
@@ -66,19 +66,19 @@ class Buttons {
 
     class Button {
       private:
-        uint8_t gpio_pin;
-        uint32_t gpio_mask;
+        uint8_t m_gpio_pin;
+        uint32_t m_gpio_mask;
 
-        uint32_t last_change;
-        bool active;
+        uint32_t m_last_change{0};
+        bool m_active{false};
 
       public:
         Button(uint8_t pin);
 
-        uint8_t getGpioPin() const { return gpio_pin; };
-        uint32_t getGpioMask() const { return gpio_mask; };
+        [[nodiscard]] uint8_t getGpioPin() const { return m_gpio_pin; };
+        [[nodiscard]] uint32_t getGpioMask() const { return m_gpio_mask; };
 
-        bool getState() const { return active; };
+        [[nodiscard]] bool getState() const { return m_active; };
         void setState(bool state, uint8_t debounce_delay);
     };
 
@@ -88,7 +88,7 @@ class Buttons {
     };
 
     Config m_config;
-    SocdState m_socd_state;
+    SocdState m_socd_state{.lastVertical = Id::DOWN, .lastHorizontal = Id::RIGHT};
     std::map<Id, Button> m_buttons;
 
     void socdClean(Utils::InputState &input_state);
