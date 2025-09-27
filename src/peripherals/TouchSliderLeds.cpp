@@ -86,7 +86,7 @@ TouchSliderLeds::Config::Color max_color(const TouchSliderLeds::Config::Color &a
 TouchSliderLeds::TouchSliderLeds(const Config &config) : m_config(config) {
     m_rendered_frame = std::vector<uint32_t>(32 * config.leds_per_segment, ws2812_rgb_to_u32pixel(0, 0, 0));
 
-    ws2812_init(config.led_pin, m_config.is_rgbw);
+    ws2812_init(pio0, config.led_pin, m_config.is_rgbw);
 }
 
 void TouchSliderLeds::setBrightness(uint8_t brightness) { m_config.brightness = brightness; }
@@ -232,7 +232,7 @@ void TouchSliderLeds::render(uint32_t steps) {
     }
 }
 
-void TouchSliderLeds::show() { ws2812_put_frame(m_rendered_frame.data(), m_rendered_frame.size()); }
+void TouchSliderLeds::show() { ws2812_put_frame(pio0, m_rendered_frame.data(), m_rendered_frame.size()); }
 
 void TouchSliderLeds::update() {
     static uint32_t previous_frame_time = to_ms_since_boot(get_absolute_time());
@@ -279,7 +279,7 @@ void TouchSliderLeds::update(const TouchSliderLeds::RawFrameMessage &frame) {
         ++idx;
     }
 
-    ws2812_put_frame(m_rendered_frame.data(), m_rendered_frame.size());
+    ws2812_put_frame(pio0, m_rendered_frame.data(), m_rendered_frame.size());
 }
 
 } // namespace Divacon::Peripherals
