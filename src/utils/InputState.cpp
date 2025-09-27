@@ -6,6 +6,39 @@
 
 namespace Divacon::Utils {
 
+namespace {
+
+static uint8_t getHidHat(const InputState::DPad dpad) {
+    if (dpad.up && dpad.right) {
+        return 0x01;
+    }
+    if (dpad.down && dpad.right) {
+        return 0x03;
+    }
+    if (dpad.down && dpad.left) {
+        return 0x05;
+    }
+    if (dpad.up && dpad.left) {
+        return 0x07;
+    }
+    if (dpad.up) {
+        return 0x00;
+    }
+    if (dpad.right) {
+        return 0x02;
+    }
+    if (dpad.down) {
+        return 0x04;
+    }
+    if (dpad.left) {
+        return 0x06;
+    }
+
+    return 0x08;
+}
+
+} // namespace
+
 usb_report_t InputState::getReport(usb_mode_t mode) {
     switch (mode) {
     case USB_MODE_SWITCH_DIVACON:
@@ -32,28 +65,6 @@ usb_report_t InputState::getReport(usb_mode_t mode) {
 }
 
 InputState::InputMessage InputState::getInputMessage() { return {.buttons = buttons, .touches = touches}; }
-
-static uint8_t getHidHat(const InputState::DPad dpad) {
-    if (dpad.up && dpad.right) {
-        return 0x01;
-    } else if (dpad.down && dpad.right) {
-        return 0x03;
-    } else if (dpad.down && dpad.left) {
-        return 0x05;
-    } else if (dpad.up && dpad.left) {
-        return 0x07;
-    } else if (dpad.up) {
-        return 0x00;
-    } else if (dpad.right) {
-        return 0x02;
-    } else if (dpad.down) {
-        return 0x04;
-    } else if (dpad.left) {
-        return 0x06;
-    }
-
-    return 0x08;
-}
 
 usb_report_t InputState::getSwitchReport() {
     m_switch_report.buttons = 0                                 //
@@ -367,7 +378,7 @@ bool InputState::checkHotkey() {
     static const uint32_t hold_timeout = 2000;
 
     if (buttons.start && buttons.select) {
-        uint32_t now = to_ms_since_boot(get_absolute_time());
+        const uint32_t now = to_ms_since_boot(get_absolute_time());
         if (!hold_active) {
             hold_active = true;
             hold_since = now;

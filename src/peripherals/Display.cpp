@@ -10,7 +10,9 @@
 
 namespace Divacon::Peripherals {
 
-static const std::array<uint8_t, 1154> menu_screen_sub = {
+namespace {
+
+const std::array<uint8_t, 1154> menu_screen_sub = {
     0x42, 0x4d, 0x82, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x82, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00, 0x80,
     0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
     0x23, 0x2e, 0x00, 0x00, 0x23, 0x2e, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
@@ -73,7 +75,7 @@ static const std::array<uint8_t, 1154> menu_screen_sub = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-static const std::array<uint8_t, 1154> menu_screen_top = {
+const std::array<uint8_t, 1154> menu_screen_top = {
     0x42, 0x4d, 0x82, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x82, 0x00, 0x00, 0x00, 0x6c, 0x00, 0x00, 0x00, 0x80,
     0x00, 0x00, 0x00, 0x40, 0x00, 0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x00, 0x00,
     0x23, 0x2e, 0x00, 0x00, 0x23, 0x2e, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0xff,
@@ -136,29 +138,7 @@ static const std::array<uint8_t, 1154> menu_screen_top = {
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
     0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
 
-Display::Display(const Config &config) : m_config(config) {
-    i2c_init(m_config.i2c_block, m_config.i2c_speed_hz);
-    gpio_set_function(m_config.sda_pin, GPIO_FUNC_I2C);
-    gpio_set_function(m_config.scl_pin, GPIO_FUNC_I2C);
-    gpio_pull_up(m_config.sda_pin);
-    gpio_pull_up(m_config.scl_pin);
-
-    m_display.external_vcc = false;
-    ssd1306_init(&m_display, 128, 64, m_config.i2c_address, m_config.i2c_block);
-    ssd1306_clear(&m_display);
-}
-
-void Display::setTouched(uint32_t touched) { m_touched = touched; }
-void Display::setButtons(const Utils::InputState::Buttons &buttons) { m_buttons = buttons; }
-void Display::setUsbMode(usb_mode_t mode) { m_usb_mode = mode; };
-void Display::setPlayerId(uint8_t player_id) { m_player_id = player_id; };
-
-void Display::setMenuState(const Utils::Menu::State &menu_state) { m_menu_state = menu_state; }
-
-void Display::showIdle() { m_state = State::Idle; }
-void Display::showMenu() { m_state = State::Menu; }
-
-static std::string modeToString(usb_mode_t mode) {
+std::string modeToString(usb_mode_t mode) {
     switch (mode) {
     case USB_MODE_SWITCH_DIVACON:
         return "Switch Diva";
@@ -231,8 +211,8 @@ static uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
     };
     static StatBuffer stat_buffer(window_size);
 
-    uint32_t now = to_ms_since_boot(get_absolute_time());
-    uint32_t interval = now - prev_press;
+    const uint32_t now = to_ms_since_boot(get_absolute_time());
+    const uint32_t interval = now - prev_press;
 
     if (interval > reset_after) {
         stat_buffer.clear();
@@ -257,9 +237,33 @@ static uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
     return current_bpm;
 }
 
+} // namespace
+
+Display::Display(const Config &config) : m_config(config) {
+    i2c_init(m_config.i2c_block, m_config.i2c_speed_hz);
+    gpio_set_function(m_config.sda_pin, GPIO_FUNC_I2C);
+    gpio_set_function(m_config.scl_pin, GPIO_FUNC_I2C);
+    gpio_pull_up(m_config.sda_pin);
+    gpio_pull_up(m_config.scl_pin);
+
+    m_display.external_vcc = false;
+    ssd1306_init(&m_display, 128, 64, m_config.i2c_address, m_config.i2c_block);
+    ssd1306_clear(&m_display);
+}
+
+void Display::setTouched(uint32_t touched) { m_touched = touched; }
+void Display::setButtons(const Utils::InputState::Buttons &buttons) { m_buttons = buttons; }
+void Display::setUsbMode(usb_mode_t mode) { m_usb_mode = mode; };
+void Display::setPlayerId(uint8_t player_id) { m_player_id = player_id; };
+
+void Display::setMenuState(const Utils::Menu::State &menu_state) { m_menu_state = menu_state; }
+
+void Display::showIdle() { m_state = State::Idle; }
+void Display::showMenu() { m_state = State::Menu; }
+
 void Display::drawIdleScreen() {
     // Header
-    std::string mode_string = modeToString(m_usb_mode) + " mode";
+    const std::string mode_string = modeToString(m_usb_mode) + " mode";
     ssd1306_draw_string(&m_display, 0, 0, 1, mode_string.c_str());
     ssd1306_draw_line(&m_display, 0, 10, 128, 10);
 

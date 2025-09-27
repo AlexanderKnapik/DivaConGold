@@ -61,9 +61,9 @@ bool hid_control_xfer_cb(uint8_t rhport, uint8_t stage, tusb_control_request_t c
         request->bmRequestType == 0xA1 && request->bRequest == HID_REQ_CONTROL_GET_REPORT &&
         request->wValue == 0x0300) {
         return tud_hid_report(0, magic_init_bytes, sizeof(magic_init_bytes));
-    } else {
-        return hidd_control_xfer_cb(rhport, stage, request);
     }
+
+    return hidd_control_xfer_cb(rhport, stage, request);
 }
 
 uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance) {

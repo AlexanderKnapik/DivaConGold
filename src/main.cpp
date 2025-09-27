@@ -22,6 +22,8 @@
 
 using namespace Divacon;
 
+namespace {
+
 queue_t control_queue;
 queue_t menu_display_queue;
 queue_t input_queue;
@@ -158,6 +160,8 @@ void core1_task() {
         sleep_ms(1);
     }
 }
+
+} // namespace
 
 int main() {
     queue_init(&control_queue, sizeof(ControlMessage), 1);

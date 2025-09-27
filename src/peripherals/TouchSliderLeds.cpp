@@ -150,7 +150,7 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
         const auto frame_position = rainbow_position / rainbow_colors.size();
 
         for (size_t idx = 0; idx < m_idle_buffer.size(); ++idx) {
-            size_t offset = (frame_position + idx) % rainbow_length;
+            const size_t offset = (frame_position + idx) % rainbow_length;
             m_idle_buffer.at(idx) = rainbow_colors.at(frame).at(offset);
         }
     } break;
@@ -265,9 +265,9 @@ void TouchSliderLeds::update(const TouchSliderLeds::RawFrameMessage &frame) {
     for (const auto &color : frame) {
         for (uint16_t led = 0; led < m_config.leds_per_segment; ++led) {
             // Allow limiting max brightness to stay within USB power restrictions.
-            uint8_t color_max = std::max({color.r, color.g, color.b});
+            const uint8_t color_max = std::max({color.r, color.g, color.b});
             if (color_max > m_config.brightness) {
-                float dim_factor = (float)m_config.brightness / (float)color_max;
+                const auto dim_factor = (float)m_config.brightness / (float)color_max;
                 m_rendered_frame.at((idx * m_config.leds_per_segment) + led) = ws2812_rgb_to_u32pixel(
                     (uint8_t)((float)color.r * dim_factor), (uint8_t)((float)color.g * dim_factor),
                     (uint8_t)((float)color.b * dim_factor));

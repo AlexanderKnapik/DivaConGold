@@ -8,7 +8,11 @@
 
 namespace Divacon::Utils {
 
-static uint8_t read_byte(uint32_t offset) { return *(reinterpret_cast<uint8_t *>(XIP_BASE + offset)); }
+namespace {
+
+uint8_t read_byte(uint32_t offset) { return *(reinterpret_cast<uint8_t *>(XIP_BASE + offset)); }
+
+} // namespace
 
 SettingsStore::SettingsStore()
     : m_store_cache({.in_use = m_magic_byte,
@@ -30,9 +34,8 @@ SettingsStore::SettingsStore()
         if (read_byte(current_page) == m_magic_byte) {
             found_valid = true;
             break;
-        } else {
-            current_page -= m_store_size;
         }
+        current_page -= m_store_size;
     }
 
     if (found_valid) {
@@ -133,7 +136,7 @@ bool SettingsStore::getLedEnablePdloaderSupport() { return m_store_cache.led_ena
 void SettingsStore::store() {
     if (m_dirty) {
         multicore_lockout_start_blocking();
-        uint32_t interrupts = save_and_disable_interrupts();
+        const uint32_t interrupts = save_and_disable_interrupts();
 
         uint32_t current_page = m_flash_offset;
         bool do_erase = true;
@@ -141,9 +144,8 @@ void SettingsStore::store() {
             if (read_byte(current_page) == 0xFF) {
                 do_erase = false;
                 break;
-            } else {
-                current_page += m_store_size;
             }
+            current_page += m_store_size;
         }
 
         if (do_erase) {
@@ -174,7 +176,7 @@ void SettingsStore::store() {
 
 void SettingsStore::reset() {
     multicore_lockout_start_blocking();
-    uint32_t interrupts = save_and_disable_interrupts();
+    const uint32_t interrupts = save_and_disable_interrupts();
 
     flash_range_erase(m_flash_offset, m_flash_size);
 

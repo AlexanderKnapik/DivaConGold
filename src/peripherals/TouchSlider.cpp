@@ -235,10 +235,12 @@ void TouchSlider::updateInputState(Utils::InputState &input_state) {
 void TouchSlider::read() {
     static uint32_t last_read = 0;
 
-    uint32_t now = to_ms_since_boot(get_absolute_time());
+    const uint32_t now = to_ms_since_boot(get_absolute_time());
     if ((last_read + 1) <= now) {
         m_touched = m_touch_controller->read();
     }
+
+    last_read = now;
 }
 
 } // namespace Divacon::Peripherals

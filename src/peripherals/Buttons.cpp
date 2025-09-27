@@ -13,7 +13,7 @@ void Buttons::Button::setState(bool state, uint8_t debounce_delay) {
     }
 
     // Immediately change the input state, but only allow a change every debounce_delay milliseconds.
-    uint32_t now = to_ms_since_boot(get_absolute_time());
+    const uint32_t now = to_ms_since_boot(get_absolute_time());
     if (m_last_change + debounce_delay <= now) {
         m_active = state;
         m_last_change = now;
@@ -77,7 +77,7 @@ Buttons::Buttons(const Config &config) : m_config(config) {
 void Buttons::setMirrorToDpad(bool mirror_to_dpad) { m_config.mirror_to_dpad = mirror_to_dpad; }
 
 void Buttons::updateInputState(Utils::InputState &input_state) {
-    uint32_t gpio_state = ~gpio_get_all();
+    const uint32_t gpio_state = ~gpio_get_all();
 
     for (auto &button : m_buttons) {
         button.second.setState(gpio_state & button.second.getGpioMask(), m_config.debounce_delay_ms);

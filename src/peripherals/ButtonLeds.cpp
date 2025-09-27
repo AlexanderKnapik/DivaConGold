@@ -6,11 +6,11 @@ namespace Divacon::Peripherals {
 
 ButtonLeds::ButtonLeds(const Config &config, bool enable_pdloader_support)
     : m_config(config), m_enable_pdloader_support(enable_pdloader_support) {
-    uint button_mask = 0                          //
-                       | 1 << m_config.pins.north //
-                       | 1 << m_config.pins.east  //
-                       | 1 << m_config.pins.south //
-                       | 1 << m_config.pins.west;
+    const uint button_mask = 0                          //
+                             | 1 << m_config.pins.north //
+                             | 1 << m_config.pins.east  //
+                             | 1 << m_config.pins.south //
+                             | 1 << m_config.pins.west;
 
     gpio_init_mask(button_mask);
     gpio_set_dir_out_masked(button_mask);
