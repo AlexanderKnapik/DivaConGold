@@ -19,7 +19,7 @@ struct InputState {
     };
 
     struct AnalogStick {
-        const static uint8_t CENTER = 0x80;
+        static constexpr uint8_t CENTER = 0x80;
 
         uint8_t x{CENTER}, y{CENTER};
     };

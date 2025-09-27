@@ -4,7 +4,6 @@
 #include "pico/time.h"
 
 #include <array>
-#include <list>
 #include <numeric>
 #include <string>
 
@@ -166,78 +165,55 @@ std::string modeToString(usb_mode_t mode) {
     return "?";
 }
 
-uint16_t calculateBpm(const Utils::InputState::Buttons &buttons) {
+} // namespace
+
+void Display::BpmCounter::Buffer::insert(uint16_t value) {
+    if (m_buffer.size() >= m_size_limit) {
+        m_buffer.pop_back();
+    }
+    m_buffer.push_front(value);
+}
+
+uint16_t Display::BpmCounter::Buffer::getAvarage() const {
+    if (!m_buffer.empty()) {
+        return std::accumulate(m_buffer.begin(), m_buffer.end(), 0) / m_buffer.size();
+    }
+    return 0;
+}
+
+void Display::BpmCounter::update(const Utils::InputState::Buttons &buttons) {
     // Somewhat ugly gimmick to calculate the how often the face buttons
     // are pressed per minute.
     //
-    // It records the average time between the last 'window_size' button
+    // It records the average time between the last 'WINDOW_SIZE' button
     // presses for calculation. To avoid spikes caused by simultaneous
-    // button presses, all presses within 'double_hit_window' are counted
+    // button presses, all presses within 'DOUBLE_HIT_TIMEOUT_MS' are counted
     // as a single press.
     //
-    // Counter resets after 'reset_after'.
-
-    static const size_t window_size = 20;
-    static const uint32_t double_hit_window = 50;
-    static const uint32_t reset_after = 2000;
-
-    static Utils::InputState::Buttons prev_buttons = {};
-    static uint32_t prev_press = 0;
-    static uint16_t current_bpm = 0;
-
-    struct StatBuffer {
-      private:
-        std::list<uint16_t> m_buf;
-        size_t m_max_size;
-
-      public:
-        StatBuffer(size_t max_size) : m_max_size(max_size) {}
-
-        void clear() { m_buf.clear(); };
-
-        void insert(uint16_t val) {
-            if (m_buf.size() >= m_max_size) {
-                m_buf.pop_back();
-            }
-            m_buf.push_front(val);
-        };
-
-        uint16_t avg() {
-            if (!m_buf.empty()) {
-                return std::accumulate(m_buf.begin(), m_buf.end(), 0) / m_buf.size();
-            }
-            return 0;
-        }
-    };
-    static StatBuffer stat_buffer(window_size);
-
+    // Counter resets after 'm_timeout_ms'.
     const uint32_t now = to_ms_since_boot(get_absolute_time());
-    const uint32_t interval = now - prev_press;
+    const uint32_t interval = now - m_prev_press_time;
 
-    if (interval > reset_after) {
-        stat_buffer.clear();
-        current_bpm = 0;
-        prev_press = 0;
+    if (interval > m_timeout_ms) {
+        m_buffer.clear();
+        m_current_bpm = 0;
+        m_prev_press_time = 0;
     }
 
-    if ((interval > double_hit_window) &&
-        ((buttons.north && !prev_buttons.north) || (buttons.east && !prev_buttons.east) ||
-         (buttons.south && !prev_buttons.south) || (buttons.west && !prev_buttons.west))) {
+    if ((interval > DOUBLE_HIT_TIMEOUT_MS) &&
+        ((buttons.north && !m_prev_buttons.north) || (buttons.east && !m_prev_buttons.east) ||
+         (buttons.south && !m_prev_buttons.south) || (buttons.west && !m_prev_buttons.west))) {
 
-        if (prev_press != 0) {
-            stat_buffer.insert(interval);
-            current_bpm = 60000 / stat_buffer.avg();
+        if (m_prev_press_time != 0) {
+            m_buffer.insert(interval);
+            m_current_bpm = 60000 / m_buffer.getAvarage();
         }
 
-        prev_press = now;
+        m_prev_press_time = now;
     }
 
-    prev_buttons = buttons;
-
-    return current_bpm;
+    m_prev_buttons = buttons;
 }
-
-} // namespace
 
 Display::Display(const Config &config) : m_config(config) {
     i2c_init(m_config.i2c_block, m_config.i2c_speed_hz);
@@ -252,7 +228,7 @@ Display::Display(const Config &config) : m_config(config) {
 }
 
 void Display::setTouched(uint32_t touched) { m_touched = touched; }
-void Display::setButtons(const Utils::InputState::Buttons &buttons) { m_buttons = buttons; }
+void Display::setButtons(const Utils::InputState::Buttons &buttons) { m_bpm_counter.update(buttons); }
 void Display::setUsbMode(usb_mode_t mode) { m_usb_mode = mode; };
 void Display::setPlayerId(uint8_t player_id) { m_player_id = player_id; };
 
@@ -268,7 +244,7 @@ void Display::drawIdleScreen() {
     ssd1306_draw_line(&m_display, 0, 10, 128, 10);
 
     // BPM
-    auto bpm_str = std::to_string(calculateBpm(m_buttons)) + " bpm";
+    auto bpm_str = std::to_string(m_bpm_counter.getBpm()) + " bpm";
     ssd1306_draw_string(&m_display, (127 - (bpm_str.length() * 12)) / 2, 20, 2, bpm_str.c_str());
 
     // Player "LEDs"
@@ -360,13 +336,12 @@ void Display::drawMenuScreen() {
 }
 
 void Display::update() {
-    static const uint32_t interval_ms = 20; // Limit to ~50fps
-    static uint32_t start_ms = 0;
+    static const uint32_t interval_ms = 17; // Limit to ~60fps
 
-    if (to_ms_since_boot(get_absolute_time()) - start_ms < interval_ms) {
+    if (to_ms_since_boot(get_absolute_time()) - m_next_frame_time < interval_ms) {
         return;
     }
-    start_ms += interval_ms;
+    m_next_frame_time += interval_ms;
 
     ssd1306_clear(&m_display);
 

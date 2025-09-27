@@ -141,19 +141,8 @@ void TouchSlider::updateInputStateArcade(Utils::InputState &input_state) const {
     input_state.sticks.left.x = (uint8_t)((m_touched & 0x000000FF)) ^ Utils::InputState::AnalogStick::CENTER;
 }
 
-void TouchSlider::updateInputStateStick(Utils::InputState &input_state) const {
-    struct State {
-        uint8_t left_limit;
-        uint8_t right_limit;
-        uint8_t x_axis;
-    };
-
-    static State previous_left = {
-        .left_limit = 0, .right_limit = UINT8_MAX, .x_axis = Utils::InputState::AnalogStick::CENTER};
-    static State previous_right = {
-        .left_limit = 0, .right_limit = UINT8_MAX, .x_axis = Utils::InputState::AnalogStick::CENTER};
-
-    auto handleSide = [](uint16_t touched, State &previous_state, uint8_t &target) {
+void TouchSlider::updateInputStateStick(Utils::InputState &input_state) {
+    auto handleSide = [](uint16_t touched, StickStates::State &previous_state, uint8_t &target) {
         if (touched != 0) {
             uint8_t left_limit = 0;
             uint8_t right_limit = UINT8_MAX;
@@ -183,7 +172,7 @@ void TouchSlider::updateInputStateStick(Utils::InputState &input_state) const {
                 target = UINT8_MAX;
                 // No movement, but still touched
             } else {
-                target = previous_state.x_axis;
+                target = previous_state.value;
             }
 
             previous_state.left_limit = left_limit;
@@ -194,13 +183,13 @@ void TouchSlider::updateInputStateStick(Utils::InputState &input_state) const {
             previous_state.right_limit = UINT8_MAX;
             target = Utils::InputState::AnalogStick::CENTER;
         }
-        previous_state.x_axis = target;
+        previous_state.value = target;
     };
 
     // Interpret slider as two distinctive zones, controlling left and right
     // stick x-axis respectively
-    handleSide(m_touched >> 16, previous_left, input_state.sticks.left.x);
-    handleSide(m_touched & 0x0000FFFF, previous_right, input_state.sticks.right.x);
+    handleSide(m_touched >> 16, m_stick_states.left, input_state.sticks.left.x);
+    handleSide(m_touched & 0x0000FFFF, m_stick_states.right, input_state.sticks.right.x);
 
     input_state.sticks.left.y = Utils::InputState::AnalogStick::CENTER;
     input_state.sticks.right.y = Utils::InputState::AnalogStick::CENTER;
@@ -233,14 +222,12 @@ void TouchSlider::updateInputState(Utils::InputState &input_state) {
 }
 
 void TouchSlider::read() {
-    static uint32_t last_read = 0;
-
     const uint32_t now = to_ms_since_boot(get_absolute_time());
-    if ((last_read + 1) <= now) {
+    if ((m_last_read_time + 1) <= now) {
         m_touched = m_touch_controller->read();
     }
 
-    last_read = now;
+    m_last_read_time = now;
 }
 
 } // namespace Divacon::Peripherals

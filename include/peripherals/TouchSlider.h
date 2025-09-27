@@ -105,16 +105,29 @@ class TouchSlider {
         uint32_t read() final;
     };
 
+    struct StickStates {
+        struct State {
+            uint8_t left_limit{0};
+            uint8_t right_limit{UINT8_MAX};
+            uint8_t value{Utils::InputState::AnalogStick::CENTER};
+        };
+
+        State left;
+        State right;
+    };
+
     Config m_config;
     usb_mode_t m_mode;
     uint32_t m_touched{0};
+    StickStates m_stick_states;
 
     std::unique_ptr<TouchControllerInterface> m_touch_controller;
+    uint32_t m_last_read_time{0};
 
     void read();
 
     void updateInputStateArcade(Utils::InputState &input_state) const;
-    void updateInputStateStick(Utils::InputState &input_state) const;
+    void updateInputStateStick(Utils::InputState &input_state);
 
   public:
     TouchSlider(const Config &config, usb_mode_t mode);

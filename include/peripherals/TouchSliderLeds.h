@@ -11,7 +11,15 @@ namespace Divacon::Peripherals {
 
 class TouchSliderLeds {
   private:
-    const static size_t SEGMENT_COUNT = 32;
+    static constexpr size_t SEGMENT_COUNT = 32;
+
+    static constexpr uint32_t PULSE_STEPS = 4096;
+    static constexpr uint32_t RAINBOW_STEPS = 4096;
+    static constexpr uint32_t FADE_STEPS = 2048;
+    static constexpr uint32_t BLEND_STEPS = 128;
+
+    static constexpr uint8_t PULSE_DIM_PCT_MIN = 40;
+    static constexpr uint8_t PULSE_DIM_PCT_MAX = 100;
 
   public:
     struct Config {
@@ -59,10 +67,42 @@ class TouchSliderLeds {
     using RawFrameMessage = std::array<Config::Color, SEGMENT_COUNT>;
 
   private:
+    class AnimationStepper {
+      private:
+        uint32_t m_steps_until_advance;
+        uint32_t m_current_steps{0};
+
+      public:
+        AnimationStepper(uint32_t steps_until_advance) : m_steps_until_advance(steps_until_advance) {};
+        uint32_t getFrameCount(uint32_t steps);
+    };
+
     Config m_config;
     uint32_t m_touched{0};
 
+    struct {
+        AnimationStepper stepper{PULSE_STEPS};
+        uint8_t dim_percent{PULSE_DIM_PCT_MAX};
+        int8_t advance_factor{-1};
+    } m_pulse_state;
+
+    struct {
+        AnimationStepper stepper{RAINBOW_STEPS};
+        size_t position{0};
+    } m_rainbow_state;
+
+    struct {
+        AnimationStepper stepper{FADE_STEPS};
+        std::array<uint8_t, SEGMENT_COUNT> percent{};
+    } m_fade_state;
+
+    struct {
+        AnimationStepper stepper{BLEND_STEPS};
+        uint8_t percent{100};
+    } m_blend_state;
+
     std::vector<uint32_t> m_rendered_frame;
+    uint32_t m_previous_frame_time{0};
 
     std::array<Config::Color, SEGMENT_COUNT> m_idle_buffer{};
     std::array<Config::Color, SEGMENT_COUNT> m_touched_buffer{};

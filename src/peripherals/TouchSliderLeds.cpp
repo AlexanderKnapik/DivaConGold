@@ -8,21 +8,12 @@
 namespace Divacon::Peripherals {
 
 namespace {
-const uint32_t pulse_step_count = 4096;
-const uint8_t pulse_dim_percent_min = 40;
-const uint8_t pulse_dim_percent_max = 100;
-
-const uint32_t rainbow_step_count = 4096;
-
-const uint32_t fade_step_count = 2048;
-
-const uint32_t blend_step_count = 128;
 
 // Use alternating frames to allow for smoother animation
-const size_t rainbow_length = 40;
+const size_t RAINBOW_LENGTH = 40;
 
 // NOLINTBEGIN(modernize-use-designated-initializers)
-const std::array<std::array<TouchSliderLeds::Config::Color, rainbow_length>, 2> rainbow_colors{{
+const std::array<std::array<TouchSliderLeds::Config::Color, RAINBOW_LENGTH>, 2> rainbow_colors{{
     {{
         {0x5a, 0x3a, 0xc6}, {0x76, 0x36, 0xaa}, {0x91, 0x34, 0x8e}, {0xad, 0x30, 0x72}, {0xca, 0x2e, 0x56},
         {0xe6, 0x2a, 0x3a}, {0xf2, 0x2f, 0x2b}, {0xe6, 0x42, 0x33}, {0xce, 0x5c, 0x46}, {0xb6, 0x74, 0x59},
@@ -46,24 +37,6 @@ const std::array<std::array<TouchSliderLeds::Config::Color, rainbow_length>, 2> 
 }};
 // NOLINTEND(modernize-use-designated-initializers)
 
-struct AnimationStepper {
-    uint32_t steps_to_advance;
-    uint32_t current_steps;
-
-    uint32_t advance(uint32_t steps) {
-        current_steps += steps;
-        if (current_steps < steps_to_advance) {
-            return 0;
-        }
-
-        const auto advance = current_steps / steps_to_advance;
-
-        current_steps %= steps_to_advance;
-
-        return advance;
-    }
-};
-
 TouchSliderLeds::Config::Color dim_color(const TouchSliderLeds::Config::Color &color, float dim_factor) {
     return TouchSliderLeds::Config::Color{
         .r = (uint8_t)((float)color.r * dim_factor),
@@ -83,8 +56,22 @@ TouchSliderLeds::Config::Color max_color(const TouchSliderLeds::Config::Color &a
 
 } // namespace
 
+uint32_t TouchSliderLeds::AnimationStepper::getFrameCount(uint32_t steps) {
+    m_current_steps += steps;
+    if (m_current_steps < m_steps_until_advance) {
+        return 0;
+    }
+
+    const auto frames = m_current_steps / m_steps_until_advance;
+    m_current_steps %= m_steps_until_advance;
+
+    return frames;
+}
+
 TouchSliderLeds::TouchSliderLeds(const Config &config) : m_config(config) {
     m_rendered_frame = std::vector<uint32_t>(32 * config.leds_per_segment, ws2812_rgb_to_u32pixel(0, 0, 0));
+
+    m_rainbow_state.position = get_rand_32() % RAINBOW_LENGTH;
 
     ws2812_init(pio0, config.led_pin, m_config.is_rgbw);
 }
@@ -102,15 +89,6 @@ void TouchSliderLeds::setTouched(uint32_t touched) { m_touched = touched; }
 void TouchSliderLeds::setPlayerColor(const TouchSliderLeds::Config::Color &color) { m_player_color = color; }
 
 void TouchSliderLeds::updateIdle(uint32_t steps) {
-    // Pulse
-    static AnimationStepper pulse_stepper{.steps_to_advance = pulse_step_count, .current_steps = 0};
-    static uint8_t pulse_dim_percent = pulse_dim_percent_max;
-    static int8_t pulse_advance_factor = -1;
-
-    // Rainbow
-    static AnimationStepper rainbow_stepper{.steps_to_advance = rainbow_step_count, .current_steps = 0};
-    static size_t rainbow_position = get_rand_32() % rainbow_length;
-
     if (steps <= 0) {
         return;
     }
@@ -127,39 +105,36 @@ void TouchSliderLeds::updateIdle(uint32_t steps) {
         m_idle_buffer.fill(idle_color);
         break;
     case Config::IdleMode::Pulse: {
-        const auto advance = pulse_stepper.advance(steps);
+        const auto advance = m_pulse_state.stepper.getFrameCount(steps);
 
-        if (pulse_advance_factor < 0 && advance >= (uint8_t)(pulse_dim_percent - pulse_dim_percent_min)) {
-            pulse_dim_percent = pulse_dim_percent_min;
-            pulse_advance_factor = (int8_t)(-pulse_advance_factor);
-        } else if (pulse_advance_factor > 0 && advance + pulse_dim_percent >= pulse_dim_percent_max) {
-            pulse_dim_percent = pulse_dim_percent_max;
-            pulse_advance_factor = (int8_t)(-pulse_advance_factor);
+        if (m_pulse_state.advance_factor < 0 && advance >= (uint8_t)(m_pulse_state.dim_percent - PULSE_DIM_PCT_MIN)) {
+            m_pulse_state.dim_percent = PULSE_DIM_PCT_MIN;
+            m_pulse_state.advance_factor = (int8_t)(-m_pulse_state.advance_factor);
+        } else if (m_pulse_state.advance_factor > 0 && advance + m_pulse_state.dim_percent >= PULSE_DIM_PCT_MAX) {
+            m_pulse_state.dim_percent = PULSE_DIM_PCT_MAX;
+            m_pulse_state.advance_factor = (int8_t)(-m_pulse_state.advance_factor);
         } else {
-            pulse_dim_percent = pulse_dim_percent + (pulse_advance_factor * advance);
+            m_pulse_state.dim_percent += (m_pulse_state.advance_factor * advance);
         }
 
-        m_idle_buffer.fill(dim_color(idle_color, (float)pulse_dim_percent / 100.F));
+        m_idle_buffer.fill(dim_color(idle_color, (float)m_pulse_state.dim_percent / 100.F));
     } break;
     case Config::IdleMode::RainbowCycle:
-        rainbow_position =
-            (rainbow_position + rainbow_stepper.advance(steps)) % (rainbow_length * rainbow_colors.size());
+        m_rainbow_state.position = (m_rainbow_state.position + m_rainbow_state.stepper.getFrameCount(steps)) %
+                                   (RAINBOW_LENGTH * rainbow_colors.size());
         [[fallthrough]];
     case Config::IdleMode::RainbowStatic: {
-        const auto frame = rainbow_position % rainbow_colors.size();
-        const auto frame_position = rainbow_position / rainbow_colors.size();
+        const auto frame = m_rainbow_state.position % rainbow_colors.size();
+        const auto frame_position = m_rainbow_state.position / rainbow_colors.size();
 
         for (size_t idx = 0; idx < m_idle_buffer.size(); ++idx) {
-            const size_t offset = (frame_position + idx) % rainbow_length;
+            const size_t offset = (frame_position + idx) % RAINBOW_LENGTH;
             m_idle_buffer.at(idx) = rainbow_colors.at(frame).at(offset);
         }
     } break;
     }
 }
 void TouchSliderLeds::updateTouched(uint32_t steps) {
-    static AnimationStepper fade_stepper{.steps_to_advance = fade_step_count, .current_steps = 0};
-    static std::array<uint8_t, SEGMENT_COUNT> fade_percent = {};
-
     switch (m_config.touched_mode) {
     case Config::TouchedMode::Off:
         m_touched_buffer.fill({.r = 0x00, .g = 0x00, .b = 0x00});
@@ -177,28 +152,32 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
         }
         break;
     case Config::TouchedMode::TouchedFade: {
-        const auto advance = fade_stepper.advance(steps);
+        const auto advance = m_fade_state.stepper.getFrameCount(steps);
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if ((m_touched & ((uint32_t)0x80000000 >> idx)) != 0) {
                 m_touched_buffer.at(idx) = m_config.touched_color;
-                fade_percent.at(idx) = 100;
+                m_fade_state.percent.at(idx) = 100;
             } else {
-                m_touched_buffer.at(idx) = dim_color(m_touched_buffer.at(idx), (float)fade_percent.at(idx) / 100.F);
-                fade_percent.at(idx) = advance > fade_percent.at(idx) ? 0 : fade_percent.at(idx) - advance;
+                m_touched_buffer.at(idx) =
+                    dim_color(m_touched_buffer.at(idx), (float)m_fade_state.percent.at(idx) / 100.F);
+                m_fade_state.percent.at(idx) =
+                    advance > m_fade_state.percent.at(idx) ? 0 : m_fade_state.percent.at(idx) - advance;
             }
         }
     } break;
     case Config::TouchedMode::TouchedIdle: {
-        const auto advance = fade_stepper.advance(steps);
+        const auto advance = m_fade_state.stepper.getFrameCount(steps);
 
         for (size_t idx = 0; idx < SEGMENT_COUNT; ++idx) {
             if ((m_touched & ((uint32_t)0x80000000 >> idx)) != 0) {
                 m_touched_buffer.at(idx) = m_idle_buffer.at(idx);
-                fade_percent.at(idx) = 100;
+                m_fade_state.percent.at(idx) = 100;
             } else {
-                m_touched_buffer.at(idx) = dim_color(m_touched_buffer.at(idx), (float)fade_percent.at(idx) / 100.F);
-                fade_percent.at(idx) = advance > fade_percent.at(idx) ? 0 : fade_percent.at(idx) - advance;
+                m_touched_buffer.at(idx) =
+                    dim_color(m_touched_buffer.at(idx), (float)m_fade_state.percent.at(idx) / 100.F);
+                m_fade_state.percent.at(idx) =
+                    advance > m_fade_state.percent.at(idx) ? 0 : m_fade_state.percent.at(idx) - advance;
             }
         }
     } break;
@@ -206,18 +185,16 @@ void TouchSliderLeds::updateTouched(uint32_t steps) {
 }
 
 void TouchSliderLeds::render(uint32_t steps) {
-    static AnimationStepper blend_stepper{.steps_to_advance = blend_step_count, .current_steps = 0};
-    static uint8_t blend_percent = 100;
-
-    const auto blend_advance = blend_stepper.advance(steps);
+    const auto blend_advance = m_blend_state.stepper.getFrameCount(steps);
     if (m_touched != 0) {
-        blend_percent = blend_advance > blend_percent ? 0 : blend_percent - blend_advance;
+        m_blend_state.percent = blend_advance > m_blend_state.percent ? 0 : m_blend_state.percent - blend_advance;
     } else {
-        blend_percent = blend_advance + blend_percent > 100 ? 100 : blend_percent + blend_advance;
+        m_blend_state.percent =
+            blend_advance + m_blend_state.percent > 100 ? 100 : m_blend_state.percent + blend_advance;
     }
 
     const auto brightness_dim_factor = (float)m_config.brightness / 255.F;
-    const auto blend_dim_factor = (float)blend_percent / 100.F;
+    const auto blend_dim_factor = (float)m_blend_state.percent / 100.F;
 
     size_t idx = 0;
     for (auto &rendered_segment : m_rendered_frame) {
@@ -235,13 +212,11 @@ void TouchSliderLeds::render(uint32_t steps) {
 void TouchSliderLeds::show() { ws2812_put_frame(pio0, m_rendered_frame.data(), m_rendered_frame.size()); }
 
 void TouchSliderLeds::update() {
-    static uint32_t previous_frame_time = to_ms_since_boot(get_absolute_time());
-
     const uint32_t now = to_ms_since_boot(get_absolute_time());
-    const uint32_t elapsed = now - previous_frame_time;
+    const uint32_t elapsed = now - m_previous_frame_time;
     const uint32_t steps = elapsed * m_config.animation_speed;
 
-    previous_frame_time = now;
+    m_previous_frame_time = now;
 
     if (m_raw_mode && m_config.enable_pdloader_support) {
         return;
