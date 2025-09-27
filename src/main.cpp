@@ -5,6 +5,7 @@
 #include "peripherals/TouchSliderLeds.h"
 #include "usb/device/hid/ps4_auth.h"
 #include "usb/device_driver.h"
+#include "utils/InputReport.h"
 #include "utils/InputState.h"
 #include "utils/Menu.h"
 #include "utils/PS4AuthProvider.h"
@@ -76,10 +77,10 @@ void core1_task() {
     Utils::PS4AuthProvider ps4authprovider;
     std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge{};
 
-    ControlMessage control_msg{};
-    Utils::Menu::State menu_display_msg{};
     Utils::InputState::InputMessage input_msg{};
+    Utils::Menu::State menu_display_msg{};
     Peripherals::TouchSliderLeds::RawFrameMessage slider_led_msg;
+    ControlMessage control_msg{};
 
     while (true) {
         if (queue_try_remove(&control_queue, &control_msg)) {
@@ -156,8 +157,6 @@ void core1_task() {
 
         buttonleds.update();
         display.update();
-
-        sleep_ms(1);
     }
 }
 
@@ -171,16 +170,67 @@ int main() {
     queue_init(&auth_challenge_queue, sizeof(std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH>), 1);
     queue_init(&auth_signed_challenge_queue, sizeof(std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH>), 1);
 
+    stdio_init_all();
+
+    Peripherals::Buttons buttons(Config::Default::buttons_config);
+
+    Utils::InputReport input_report;
     Utils::InputState input_state;
-    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response{};
+    const auto checkHotkey = [&input_state]() {
+        static const uint32_t hold_timeout = 2000;
+        static uint32_t hold_since = 0;
+        static bool hold_active = false;
+
+        if (input_state.buttons.start && input_state.buttons.select) {
+            const uint32_t now = to_ms_since_boot(get_absolute_time());
+            if (!hold_active) {
+                hold_active = true;
+                hold_since = now;
+            } else if ((now - hold_since) > hold_timeout) {
+                hold_active = false;
+                return true;
+            }
+        } else {
+            hold_active = false;
+        }
+        return false;
+    };
 
     auto settings_store = std::make_shared<Utils::SettingsStore>();
-    Utils::Menu menu(settings_store);
-
     const auto mode = settings_store->getUsbMode();
+    const auto readSettings = [&]() {
+        const auto sendCtrlMessage = [&](const ControlMessage &msg) { queue_add_blocking(&control_queue, &msg); };
+
+        sendCtrlMessage({.command = ControlCommand::SetUsbMode, .data = {.usb_mode = mode}});
+        sendCtrlMessage({.command = ControlCommand::SetLedBrightness,
+                         .data = {.led_brightness = settings_store->getLedBrightness()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedAnimationSpeed,
+                         .data = {.led_animation_speed = settings_store->getLedAnimationSpeed()}});
+        sendCtrlMessage(
+            {.command = ControlCommand::SetLedIdleMode, .data = {.led_idle_mode = settings_store->getLedIdleMode()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedTouchedMode,
+                         .data = {.led_touched_mode = settings_store->getLedTouchedMode()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedIdleColor,
+                         .data = {.led_idle_color = settings_store->getLedIdleColor()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedTouchedColor,
+                         .data = {.led_touched_color = settings_store->getLedTouchedColor()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedEnablePlayerColor,
+                         .data = {.led_enable_player_color = settings_store->getLedEnablePlayerColor()}});
+        sendCtrlMessage({.command = ControlCommand::SetLedEnablePdloaderSupport,
+                         .data = {.led_enable_pdloader_support = settings_store->getLedEnablePdloaderSupport()}});
+
+        buttons.setMirrorToDpad(settings_store->getInputMirrorToDpad());
+    };
 
     Peripherals::TouchSlider touch_slider(Config::Default::touch_slider_config, mode);
-    Peripherals::Buttons buttons(Config::Default::buttons_config);
+    Utils::Menu menu(settings_store);
+
+    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response{};
+    if (Config::PS4Auth::config.enabled) {
+        ps4_auth_init(Config::PS4Auth::config.key_pem.c_str(), Config::PS4Auth::config.key_pem.size() + 1,
+                      Config::PS4Auth::config.serial.data(), Config::PS4Auth::config.signature.data(),
+                      [](const uint8_t *challenge) { queue_try_add(&auth_challenge_queue, challenge); });
+    }
 
     multicore_launch_core1(core1_task);
 
@@ -218,38 +268,6 @@ int main() {
         queue_try_add(&led_queue, &led_message);
     });
 
-    if (Config::PS4Auth::config.enabled) {
-        ps4_auth_init(Config::PS4Auth::config.key_pem.c_str(), Config::PS4Auth::config.key_pem.size() + 1,
-                      Config::PS4Auth::config.serial.data(), Config::PS4Auth::config.signature.data(),
-                      [](const uint8_t *challenge) { queue_try_add(&auth_challenge_queue, challenge); });
-    }
-
-    stdio_init_all();
-
-    const auto readSettings = [&]() {
-        buttons.setMirrorToDpad(settings_store->getInputMirrorToDpad());
-
-        const auto sendCtrlMessage = [&](const ControlMessage &msg) { queue_add_blocking(&control_queue, &msg); };
-
-        sendCtrlMessage({.command = ControlCommand::SetUsbMode, .data = {.usb_mode = mode}});
-        sendCtrlMessage({.command = ControlCommand::SetLedBrightness,
-                         .data = {.led_brightness = settings_store->getLedBrightness()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedAnimationSpeed,
-                         .data = {.led_animation_speed = settings_store->getLedAnimationSpeed()}});
-        sendCtrlMessage(
-            {.command = ControlCommand::SetLedIdleMode, .data = {.led_idle_mode = settings_store->getLedIdleMode()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedTouchedMode,
-                         .data = {.led_touched_mode = settings_store->getLedTouchedMode()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedIdleColor,
-                         .data = {.led_idle_color = settings_store->getLedIdleColor()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedTouchedColor,
-                         .data = {.led_touched_color = settings_store->getLedTouchedColor()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedEnablePlayerColor,
-                         .data = {.led_enable_player_color = settings_store->getLedEnablePlayerColor()}});
-        sendCtrlMessage({.command = ControlCommand::SetLedEnablePdloaderSupport,
-                         .data = {.led_enable_pdloader_support = settings_store->getLedEnablePdloaderSupport()}});
-    };
-
     readSettings();
 
     while (true) {
@@ -273,14 +291,14 @@ int main() {
             readSettings();
             input_state.releaseAll();
 
-        } else if (input_state.checkHotkey()) {
+        } else if (checkHotkey()) {
             menu.activate();
 
             ControlMessage ctrl_message{.command = ControlCommand::EnterMenu, .data = {}};
             queue_add_blocking(&control_queue, &ctrl_message);
         }
 
-        usbd_driver_send_report(input_state.getReport(mode));
+        usbd_driver_send_report(input_report.getReport(input_state, mode));
         usbd_driver_task();
 
         queue_try_add(&input_queue, &input_message);

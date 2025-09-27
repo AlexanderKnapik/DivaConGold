@@ -1,17 +1,7 @@
 #ifndef UTILS_INPUTSTATE_H_
 #define UTILS_INPUTSTATE_H_
 
-#include "usb/device/hid/keyboard_driver.h"
-#include "usb/device/hid/ps3_driver.h"
-#include "usb/device/hid/ps4_driver.h"
-#include "usb/device/hid/switch_driver.h"
-#include "usb/device/midi_driver.h"
-#include "usb/device/vendor/pdloader_driver.h"
-#include "usb/device/vendor/xinput_driver.h"
-#include "usb/device_driver.h"
-
 #include <cstdint>
-#include <string>
 
 namespace Divacon::Utils {
 
@@ -31,7 +21,7 @@ struct InputState {
     struct AnalogStick {
         const static uint8_t CENTER = 0x80;
 
-        uint8_t x, y;
+        uint8_t x{CENTER}, y{CENTER};
     };
 
     struct InputMessage {
@@ -39,52 +29,22 @@ struct InputState {
         uint32_t touches;
     };
 
-    DPad dpad{};       // NOLINT
-    Buttons buttons{}; // NOLINT
+    DPad dpad{};
+    Buttons buttons{};
     struct {
-        AnalogStick left = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
-        AnalogStick right = {.x = AnalogStick::CENTER, .y = AnalogStick::CENTER};
-    } sticks;            // NOLINT
-    uint32_t touches{0}; // NOLINT
+        AnalogStick left;
+        AnalogStick right;
+    } sticks{};
+    uint32_t touches{0};
 
-  private:
-    hid_switch_report_t m_switch_report{};
-    hid_ps3_report_t m_ps3_report{};
-    hid_ps4_report_t m_ps4_report{};
-    hid_nkro_keyboard_report_t m_keyboard_report{};
-    xinput_report_t m_xinput_report{};
-    pdloader_report_t m_pdloader_report{};
-    midi_report_t m_midi_report{
-        .kick = false,
-        .snare = false,
-        .hihat_closed = false,
-        .hihat_open = false,
-        .shift = 60,
-        .touched = 0,
-        .pitch_bend = 64,
-        .damper = false,
-        .portamento = false,
+    void releaseAll() {
+        dpad = {};
+        buttons = {};
+        sticks = {};
+        touches = {0};
     };
-    std::string m_debug_report;
 
-    usb_report_t getSwitchReport();
-    usb_report_t getPS3Report();
-    usb_report_t getPS4Report();
-    usb_report_t getXinputReport();
-    usb_report_t getPDLoaderReport();
-    usb_report_t getKeyboardReport();
-    usb_report_t getMidiReport();
-    usb_report_t getDebugReport();
-
-  public:
-    InputState() = default;
-
-    usb_report_t getReport(usb_mode_t mode);
-    InputMessage getInputMessage();
-
-    void releaseAll();
-
-    [[nodiscard]] bool checkHotkey() const;
+    [[nodiscard]] InputMessage getInputMessage() const { return {.buttons = buttons, .touches = touches}; };
 };
 
 } // namespace Divacon::Utils
