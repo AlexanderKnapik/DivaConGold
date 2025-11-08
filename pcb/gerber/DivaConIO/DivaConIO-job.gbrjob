@@ -5,13 +5,13 @@
       "Application": "Pcbnew",
       "Version": "9.0.5-1.fc42"
     },
-    "CreationDate": "2025-11-08T17:03:36+10:30"
+    "CreationDate": "2025-11-08T23:03:25+10:30"
   },
   "GeneralSpecs": {
     "ProjectId": {
       "Name": "DivaConIO",
       "GUID": "44697661-436f-46e4-994f-2e6b69636164",
-      "Revision": "1.0"
+      "Revision": "1.1"
     },
     "Size": {
       "X": 65.1,
@@ -27,7 +27,7 @@
       "PadToPad": 0.2,
       "PadToTrack": 0.2,
       "TrackToTrack": 0.2,
-      "MinLineWidth": 0.2032,
+      "MinLineWidth": 0.254,
       "TrackToRegion": 0.2032,
       "RegionToRegion": 0.2032
     }
