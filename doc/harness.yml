@@ -13,9 +13,9 @@ connectors:
             subtype: "Crimp"
             qty_multiplier: "pincount"
             manufacturer: "JST"
-            mpn: "SPH-002T-P0.5S"
+            mpn: "SPH-001T-P0.5L"
             supplier: "Digikey"
-            spn: "455-BPH-002T-P0.5S-ND"
+            spn: "455-2147CT-ND"
     JST_4P: &JST_4P
         <<: *JST
         pincount: 4
@@ -167,16 +167,17 @@ connectors:
         pinlabels: ["GND", "L3", "L2", "L1", "UP", "DOWN"]
     J4_IO:
         <<: *JST_8P
-        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "LED_DATA", "SLIDER_SCL", "SLIDER_SDA", "3V3", "5V"]
+        pinlabels: ["GND", "DISPLAY_I2C0_SCL", "DISPLAY_I2C0_SDA", "SLIDER_I2C1_SDA", "SLIDER_I2C1_SCL", "LED_DATA", "3V3", "5V"]
     J6_IO:
         <<: *JST_5P
-        pinlabels: ["GND", "CIRCLE", "CROSS", "SQUARE", "TRIANGLE"]
+        pinlabels: ["GND", "BUTTON_CIRCLE", "BUTTON_CROSS", "BUTTON_SQUARE", "BUTTON_TRIANGLE"]
     J7_IO:
         <<: *JST_6P
         pinlabels: ["LED-_CIRCLE", "LED-_CROSS", "LED-_SQUARE", "LED-_TRIANGLE", "LED+", "5V"]
-    J1_SLIDER:
+    J2_SLIDER:
         <<: *JST_8P
-        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "LED_DATA", "SLIDER_SCL", "SLIDER_SDA", "3V3", "5V"]
+        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "SLIDER_SDA", "SLIDER_SCL", "LED_DATA", "3V3", "5V"]
+
 
 cables:
     WIRE: &WIRE
@@ -329,7 +330,7 @@ connections:
     -
         - J4_IO: [1-8]
         - W4: [1-8]
-        - J1_SLIDER: [1-8]
+        - J2_SLIDER: [1-8]
 
 # IO BOARD J6 CABLE (BUTTONS)
     -
