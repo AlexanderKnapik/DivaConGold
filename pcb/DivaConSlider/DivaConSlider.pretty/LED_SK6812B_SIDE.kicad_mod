@@ -1,7 +1,7 @@
 (footprint "LED_SK6812B_SIDE"
-	(version 20240108)
+	(version 20241229)
 	(generator "pcbnew")
-	(generator_version "8.0")
+	(generator_version "9.0")
 	(layer "F.Cu")
 	(property "Reference" "REF**"
 		(at 0 -1.5 0)
@@ -20,19 +20,6 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(uuid "e999ef2e-abd2-4672-9b9f-43a39631f52f")
-		(effects
-			(font
-				(size 1 1)
-				(thickness 0.15)
-			)
-		)
-	)
-	(property "Footprint" ""
-		(at 6 -9.5 0)
-		(unlocked yes)
-		(layer "F.Fab")
-		(hide yes)
-		(uuid "beae0989-833c-4bb5-b985-8079f32a9ab8")
 		(effects
 			(font
 				(size 1 1)
@@ -104,7 +91,7 @@
 			(width 0.15)
 			(type solid)
 		)
-		(fill solid)
+		(fill yes)
 		(layer "F.SilkS")
 		(uuid "4d1f61d2-ac14-45f3-8929-a79f59dcb3e0")
 	)
@@ -115,7 +102,7 @@
 			(width 0.05)
 			(type default)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.CrtYd")
 		(uuid "0971d17f-acd2-4572-bfd8-6002452d910d")
 	)
@@ -126,7 +113,7 @@
 			(width 0.05)
 			(type default)
 		)
-		(fill none)
+		(fill no)
 		(layer "F.Fab")
 		(uuid "d72f5029-2ecc-4744-ad9c-2d0a846fe475")
 	)
@@ -145,7 +132,7 @@
 	(pad "1" smd custom
 		(at -1.575 0)
 		(size 0.55 1.2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(thermal_bridge_angle 45)
 		(options
 			(clearance outline)
@@ -164,7 +151,7 @@
 	(pad "2" smd custom
 		(at -0.45 0)
 		(size 0.7 1.2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(thermal_bridge_angle 45)
 		(options
 			(clearance outline)
@@ -176,7 +163,7 @@
 	(pad "3" smd custom
 		(at 0.575 0)
 		(size 0.45 1.2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(thermal_bridge_angle 45)
 		(options
 			(clearance outline)
@@ -188,7 +175,7 @@
 	(pad "4" smd custom
 		(at 1.575 0)
 		(size 0.55 1.2)
-		(layers "F.Cu" "F.Paste" "F.Mask")
+		(layers "F.Cu" "F.Mask" "F.Paste")
 		(thermal_bridge_angle 45)
 		(options
 			(clearance outline)
@@ -204,4 +191,5 @@
 		)
 		(uuid "11dc630d-c113-4bf8-a583-08a4d95ba093")
 	)
+	(embedded_fonts no)
 )

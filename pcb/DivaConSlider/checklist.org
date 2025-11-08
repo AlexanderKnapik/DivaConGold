@@ -1,0 +1,217 @@
+* Schematic review checklist
+
+** General
+- [X] CAD ERC 100% clean. If some errors are invalid due to toolchain quirks, each exception must be inspected and signed off as invalid.
+- [X] Verify pin numbers of all schematic symbols against datasheet or external interface specification document (if not yet board proven).
+- [X] Schematic symbol matches chosen component package
+  - [X] MPR121
+  - [X] Connectors
+- [X] Thermal pads are connected to correct power rail (may not always be ground)
+- [X] Debug interfaces are not power gated in sleep mode
+- [X] Verify pinning of all cables to other boards in the system (straight through vs mirror)
+
+** Passive components
+- [X] Power/voltage/tolerance ratings specified as required
+- [X] Ceramic capacitors appropriately de-rated for C/V curve
+- [X] Polarized components specified in schematic if using electrolytic caps etc
+
+** Power supply
+
+*** System power input
+
+- [X] Fusing and/or reverse voltage protection at system power inlet
+- [X] TVS at system power inlet
+- [X] Check total input capacitance and add inrush limiter if needed
+
+*** Regulators
+
+- [X] Under/overvoltage protection configured correctly if used
+- [X] Verify estimated power usage per rail against regulator rating
+- [X] Current-sense resistors on power rails after regulator output caps, not in switching loop
+- [X] Remote sense used on low voltage or high current rails
+- [X] Linear regulators and voltage reference ICs are stable with selected output cap ESR
+- [X] Confirm power rail sequencing against device datasheets
+
+*** Decoupling
+- [X] Decoupling present for all ICs
+- [X] Decoupling meets/exceeds vendor recommendations if specified
+- [X] Bulk decoupling present at PSU
+
+*** General
+- [X] All power inputs fed by correct voltage
+- [X] Check high-power discrete semiconductors and passives to confirm they can handle expected load
+- [X] Analog rails filtered/isolated from digital circuitry as needed
+
+*** Errata
+- [X] Read errata sheets (if available) for all major devices
+- [X] STM32: do not use JTRST pin as an I/O
+
+** Signals
+
+*** Digital
+
+- [X] Signals are correct logic level for input pin
+- [X] Pullups on all open-drain outputs
+- [X] Pulldowns on all PECL outputs
+- [X] Termination on all high-speed signals
+- [X] AC coupling caps on gigabit transceivers
+- [X] TX/RX paired correctly for UART, SPI, MGT, etc
+- [X] Differential pair polarity / pairing correct
+- [X] Active high/low enable signal polarity correct
+- [X] I/O banking rules met on FPGAs etc
+- [X] When using auto-sensing level shifters, ensure the intended receiver doesn't have a pullup/down
+
+*** Analog
+
+- [X] RC time constant for attenuators sane given ADC sampling frequency
+- [X] Verify frequency response of RF components across entire operating range. Don't assume a "1-100 MHz" amplifier has the same gain across the whole range.
+- [X] Verify polarity of op-amp feedback
+
+*** Clocks
+
+- [X] All oscillators meet required jitter / frequency tolerance. Be extra cautious with MEMS oscillators as these tend to have higher jitter.
+- [X] Correct load caps provided for discrete crystals
+- [X] Crystals only used if IC has an integrated crystal driver
+- [X] Banking / clock capable input rules met for clocks going to FPGAs
+  - [X] Xilinx FPGAs: single ended clocks use \_P half of differential pairs
+  - [X] If possible, create dummy design with all clocks and other key signals and verify it P&R's properly
+
+*** Strap/init pins
+- [X] Pullup/pulldowns on all signals that need defined state at boot
+- [X] Strap pins connected to correct rail for desired state
+- [X] JTAG/ICSP connector provided for all programmable devices
+- [X] Config/boot flash provided for all FPGAs or MPUs without internal flash
+- [X] Reference resistors correct value and reference rail
+
+*** External interface protection
+
+- [X] Power outputs (USB etc) current limited
+- [X] ESD protection on data lines going off board
+
+*** Debugging / reworkability
+
+- [X] Use 0-ohm resistors vs direct hard-wiring for strap pins when possible
+- [X] Provide multiple ground clips/points for scope probes
+- [X] Dedicated ground in close proximity to analog test points
+- [X] Test points on all power rails
+- [X] Test points on interesting signals which may need probing for bringup/debug
+
+** Thermal
+
+- [X] Power estimates for all large / high power ICs
+- [X] Thermal calculations for all large / high power ICs
+- [X] Specify heatsinks as needed
+
+* Layout review checklist
+
+** General
+
+- [X] [Schematic review](schematic-checklist.md) complete and signed off, including pin swaps done during layout
+- [X] Layout DRC 100% clean
+
+** Decoupling
+
+- [X] Decoupling caps as close to power pins as possible
+- [X] Low inductance mounting used for decoupling (prefer ViP if available, otherwise "[]8" shaped side vias)
+
+** DFM / yield enhancement
+
+- [X] All design rules within manufacturer's capability
+- [X] Minimize use of vias/traces that push fab limits
+- [X] Controlled impedance specified in fab notes if applicable
+- [X] Confirm impedance calculations include soldermask, or mask removed from RF traces
+- [X] Stackup verified with manufacturer and specified in fab notes
+- [X] Board finish specified in fab notes
+- [X] If panelizing, add panel location indicators for identifying location-specific reflow issues
+- [X] (recommended) Layer number markers specified to ensure correct assembly
+- [X] Fiducials present (on both sides of board) if targeting automated assembly
+- [X] Fiducial pattern asymmetric to detect rotated or flipped boards
+- [X] Soldermask/copper clearance on fiducials respected
+- [X] Panelization specified if required
+
+** Footprints
+
+- [X] Confirm components are available in the selected package
+- [X] Confirm components (especially connectors and power regulators) are capable of desired current in the selected package
+- [X] Verify schematic symbol matches the selected package
+- [X] Confirm pinout diagram is from top vs bottom of package
+- [X] FPC connectors: Verify top/bottom entry and validate pinout
+- [ ] (recommended) PCB printed 1:1 on paper and checked against physical parts
+- [X] 3D models obtained (if available) and checked against footprints
+- [X] Soldermask apertures on all SMT lands and PTH pads
+
+** Differential pairs
+- [X] Routed differentially
+- [X] Skew matched
+- [X] Correct clearance to non-coupled nets
+
+** High-speed signals
+
+- [X] Sufficient clearance to potential aggressors
+- [X] Length matched if required
+- [X] Minimize crossing reference plane splits/slots or changing layers, use caps/stitching vias if unavoidable
+- [X] Confirm fab can do copper to edge of PCB for edge launch connectors
+- [X] Double-check pad width on connectors and add plane cutouts if needed to minimize impedance discontinuities
+- [X] Add stitching vias to ground plane in large top layer ground pads (SMA etc) to avoid resonances
+
+** Power
+- [X] Minimal slots in planes from via antipads
+- [X] Sufficient width for planes/traces for required current
+
+** Sensitive analog
+- [X] Guard ring / EMI cages provided if needed
+- [X] Physically separated from high current SMPS or other noise sources
+- [X] Consider microphone effect on MLCCs if near strong sound sources
+
+** Mechanical
+- [X] Confirm all connectors to other systems comply with the appropriate mechanical standard (connector orientation, key position, etc)
+- [X] LEDs, buttons, and other UI elements on outward-facing side of board
+- [X] Keep-outs around PCB perimeter, card guides, panelization mouse-bites, etc respected
+- [X] Stress-sensitive components (MLCC) sufficiently clear from V-score or mouse bite locations, and oriented to reduce
+bending stress
+- [X] Clearance around large ICs for heatsinks/fans if required
+- [X] Clearance around pluggable connectors for mating cable/connector
+- [X] Clearance around mounting holes for screws
+- [X] Plane keepouts and clearance provided for shielded connectors, magnetics, etc
+- [X] Confirm PCB dimensions and mounting hole size/placement against enclosure or card rack design
+- [X] Verify mounting hole connection/isolation
+- [X] Components not physically overlapping/colliding
+- [X] Clearance provided around solder-in test points for probe tips
+- [X] Mounting hole positions compatible with enclosure design rules (keepouts around bends/welds etc respected)
+
+** Thermal
+
+- [X] Thermal reliefs used for plane connections (unless via is used for heatsinking)
+- [X] Solid connections used to planes if heatsinking
+- [X] Ensure thermal balance on SMT chip components to minimize risk of tombstoning
+
+** Solder paste
+
+- [X] No uncapped vias in pads (except low-power QFNs where some voiding is acceptable)
+- [X] QFN paste prints segmented
+- [X] Small pads 100% size, larger pads reduced to avoid excessive solder volume
+- [X] No paste apertures on card edge connectors or test points
+
+** Solder mask
+
+- [X] Confirm SMD vs NSMD pad geometry
+- [X] Adequate clearance around pads (typ. 50 um)
+
+** Silkscreen
+
+- [X] Text size within fab limits
+- [X] Text not overlapping drills or component pads
+- [X] Text removed entirely in, or moved outside of, high component/via density areas
+- [X] Traceability markings (rev, date, name, etc) provided
+- [X] Silkscreen box provided for writing/sticking serial number
+- [X] Text mirrored properly on bottom layer
+- [X] Test points labeled if space permits
+
+** Flex specific
+- [X] Components oriented to reduce bending forces
+- [X] Teardrops on all wire-to-pad connections
+
+** CAM production
+- [X] KiCAD specific: rerun DRC and zone fills before exporting CAM files to ensure proper results
+- [ ] Export gerber/drill files at the same time to ensure consistency
+- [ ] Visually verify final CAM files to ensure no obvious misalignments

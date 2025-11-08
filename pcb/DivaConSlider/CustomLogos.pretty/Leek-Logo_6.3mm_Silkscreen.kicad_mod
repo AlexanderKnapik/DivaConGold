@@ -31,7 +31,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "bb7f4b6a-4827-4d77-a3de-ac543374b46b")
+		(uuid "35758db7-2793-4abf-8d5d-77537eadae8d")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -43,7 +43,7 @@
 		(at 0 0 0)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "713a3f62-b857-4ab5-a4d0-d30b049c2571")
+		(uuid "a449af0e-f4ef-4bcc-a3c0-2ef3920983ee")
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -51,7 +51,7 @@
 			)
 		)
 	)
-	(attr board_only exclude_from_pos_files exclude_from_bom allow_missing_courtyard)
+	(attr exclude_from_pos_files exclude_from_bom allow_missing_courtyard)
 	(fp_poly
 		(pts
 			(xy -0.806428 -2.16322) (xy -0.769151 -2.151569) (xy -0.737057 -2.136893) (xy -0.696459 -2.110071)
