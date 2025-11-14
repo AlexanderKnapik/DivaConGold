@@ -13,9 +13,9 @@ connectors:
             subtype: "Crimp"
             qty_multiplier: "pincount"
             manufacturer: "JST"
-            mpn: "SPH-001T-P0.5L"
+            mpn: "BPH-002T-P0.5S"
             supplier: "Digikey"
-            spn: "455-2147CT-ND"
+            spn: "455-BPH-002T-P0.5S-ND"
     JST_4P: &JST_4P
         <<: *JST
         pincount: 4
@@ -158,31 +158,31 @@ connectors:
 
     J1_IO:
         <<: *JST_6P
-        pinlabels: ["GND", "R1", "R2", "R3", "RIGHT", "LEFT"]
+        pinlabels: ["GND", "LEFT", "RIGHT", "R1", "R2", "R3"]
     J2_IO:
         <<: *JST_4P
-        pinlabels: ["GND", "HOME", "START", "SELECT"]
+        pinlabels: ["GND", "START", "HOME", "SELECT"]
     J3_IO:
         <<: *JST_6P
-        pinlabels: ["GND", "L3", "L2", "L1", "UP", "DOWN"]
-    J4_IO:
-        <<: *JST_8P
-        pinlabels: ["GND", "DISPLAY_I2C0_SCL", "DISPLAY_I2C0_SDA", "SLIDER_I2C1_SDA", "SLIDER_I2C1_SCL", "LED_DATA", "3V3", "5V"]
+        pinlabels: ["GND", "DOWN", "UP", "L1", "L2", "L3"]
     J6_IO:
+        <<: *JST_8P
+        pinlabels: ["DISPLAY_I2C0_SCL", "DISPLAY_I2C0_SDA", "SLIDER_I2C1_SCL", "SLIDER_I2C1_SDA", "3V3", "GND", "5V", "nLED_DATA"]
+    J4_IO:
         <<: *JST_5P
-        pinlabels: ["GND", "BUTTON_CIRCLE", "BUTTON_CROSS", "BUTTON_SQUARE", "BUTTON_TRIANGLE"]
+        pinlabels: ["GND", "BUTTON_TRIANGLE", "BUTTON_SQUARE", "BUTTON_CROSS", "BUTTON_CIRCLE"]
     J7_IO:
         <<: *JST_6P
-        pinlabels: ["LED-_CIRCLE", "LED-_CROSS", "LED-_SQUARE", "LED-_TRIANGLE", "LED+", "5V"]
+        pinlabels: ["5V_VCC", "5V_LED+", "TRIANGLE_LED-", "SQUARE_LED-", "CROSS_LED-", "CIRCLE_LED-"]
     J2_SLIDER:
         <<: *JST_8P
-        pinlabels: ["GND", "DISPLAY_SCL", "DISPLAY_SDA", "SLIDER_SDA", "SLIDER_SCL", "LED_DATA", "3V3", "5V"]
+        pinlabels: ["DISPLAY_I2C0_SCL", "DISPLAY_I2C0_SDA", "SLIDER_I2C1_SCL", "SLIDER_I2C1_SDA", "3V3", "GND", "5V", "nLED_DATA"]
 
 
 cables:
     WIRE: &WIRE
         wirecount: 1
-        colors: [BK, BN, RD, OG, YE, GN, BU, VT, GY, WH]
+        colors: [BK, OG, YE, GN, BU, VT, GY, WH, PK]
         gauge: 24 AWG
         show_equiv: true
         ignore_in_bom: true
@@ -201,14 +201,15 @@ cables:
         wirecount: 6
     W4:
         <<: *WIRE
+        colors: [OG, YE, GN, BU, BN, BK, RD, VT]
         wirecount: 8
     W5:
         <<: *WIRE
-        colors: [RD, BU, VT, GY, WH]
+        colors: [RD, VT, GY, WH, PK]
         wirecount: 5
     W6:
         <<: *WIRE
-        colors: [BK, BN, OG, YE, GN]
+        colors: [BK, OG, YE, GN, BU]
         wirecount: 5
 
 connections:
@@ -218,19 +219,31 @@ connections:
         - W1: [1-6]
     -
         - W1: [1-2]
-        - SW_R1: [1-2]
+        - SW_LEFT: [1-2]
     -
         - W1: 3
-        - SW_R2: 2
-    -
-        - W1: 4
-        - SW_R3: 2
-    -
-        - W1: 5
         - SW_RIGHT: 2
     -
+        - W1: 4
+        - SW_R1: 2
+    -
+        - W1: 5
+        - SW_R2: 2
+    -
         - W1: 6
-        - SW_LEFT: 2
+        - SW_R3: 2
+    -
+        - SW_LEFT: 1
+        - WIRE.W_LEFT_RIGHT
+    -
+        - SW_RIGHT: 1
+        - W_LEFT_RIGHT: 1
+    -
+        - SW_RIGHT: 1
+        - WIRE.W_RIGHT_R1
+    -
+        - SW_R1: 1
+        - W_RIGHT_R1: 1
     -
         - SW_R1: 1
         - WIRE.W_R1_R2
@@ -243,18 +256,6 @@ connections:
     -
         - SW_R3: 1
         - W_R2_R3: 1
-    -
-        - SW_R3: 1
-        - WIRE.W_R3_RIGHT
-    -
-        - SW_RIGHT: 1
-        - W_R3_RIGHT: 1
-    -
-        - SW_RIGHT: 1
-        - WIRE.W_RIGHT_LEFT
-    -
-        - SW_LEFT: 1
-        - W_RIGHT_LEFT: 1
 
 # IO BOARD J2 CABLE
     -
@@ -262,25 +263,25 @@ connections:
         - W2: [1-4]
     -
         - W2: [1-2]
-        - SW_HOME: [1-2]
+        - SW_START: [1-2]
     -
         - W2: 3
-        - SW_START: 2
+        - SW_HOME: 2
     -
         - W2: 4
         - SW_SELECT: 2
     -
+        - SW_START: 1
+        - WIRE.W_START_HOME
+    -
         - SW_HOME: 1
-        - WIRE.W_HOME_START
+        - W_START_HOME: 1
     -
-        - SW_START: 1
-        - W_HOME_START: 1
-    -
-        - SW_START: 1
-        - WIRE.W_START_SELECT
+        - SW_HOME: 1
+        - WIRE.W_HOME_SELECT
     -
         - SW_SELECT: 1
-        - W_START_SELECT: 1
+        - W_HOME_SELECT: 1
 
 # IO BOARD J3 CABLE
     -
@@ -288,98 +289,98 @@ connections:
         - W3: [1-6]
     -
         - W3: [1-2]
-        - SW_L3: [1-2]
+        - SW_DOWN: [1-2]
     -
         - W3: 3
-        - SW_L2: 2
+        - SW_UP: 2
     -
         - W3: 4
         - SW_L1: 2
     -
         - W3: 5
-        - SW_UP: 2
+        - SW_L2: 2
     -
         - W3: 6
-        - SW_DOWN: 2
-    -
-        - SW_L3: 1
-        - WIRE.W_L3_L2
-    -
-        - SW_L2: 1
-        - W_L3_L2: 1
-    -
-        - SW_L2: 1
-        - WIRE.W_L2_L1
-    -
-        - SW_L1: 1
-        - W_L2_L1: 1
-    -
-        - SW_L1: 1
-        - WIRE.W_L1_UP
-    -
-        - SW_UP: 1
-        - W_L1_UP: 1
-    -
-        - SW_UP: 1
-        - WIRE.W_UP_DOWN
+        - SW_L3: 2
     -
         - SW_DOWN: 1
-        - W_UP_DOWN: 1
-
-# IO BOARD J4 CABLE
+        - WIRE.W_DOWN_UP
     -
-        - J4_IO: [1-8]
+        - SW_UP: 1
+        - W_DOWN_UP: 1
+    -
+        - SW_UP: 1
+        - WIRE.W_UP_L1
+    -
+        - SW_L1: 1
+        - W_UP_L1: 1
+    -
+        - SW_L1: 1
+        - WIRE.W_L1_L2
+    -
+        - SW_L2: 1
+        - W_L1_L2: 1
+    -
+        - SW_L2: 1
+        - WIRE.W_L2_L3
+    -
+        - SW_L3: 1
+        - W_L2_L3: 1
+
+# IO BOARD J6 CABLE
+    -
+        - J6_IO: [1-8]
         - W4: [1-8]
         - J2_SLIDER: [1-8]
 
-# IO BOARD J6 CABLE (BUTTONS)
+# IO BOARD J4 CABLE (BUTTONS)
     -
-        - J6_IO: [1-5]
+        - J4_IO: [1-5]
         - W6: [1-5]
     -
         - W6: [1-2]
-        - SW_CIRCLE: [1-2]
+        - SW_TRIANGLE: [1-2]
     -
         - W6: 3
-        - SW_CROSS: 2
-    -
-        - W6: 4
         - SW_SQUARE: 2
     -
+        - W6: 4
+        - SW_CROSS: 2
+    -
         - W6: 5
-        - SW_TRIANGLE: 2
+        - SW_CIRCLE: 2
     -
         - SW_CIRCLE: [1, 4]
-        - WIRE_SW.W_SW_CIRCLE_SW_CROSS: [1, 2]
+        - WIRE_SW.W_SW_CROSS_SW_CIRCLE: [1, 2]
     -
         - SW_CROSS: [1, 4]
-        - W_SW_CIRCLE_SW_CROSS: [1, 2]
+        - W_SW_CROSS_SW_CIRCLE: [1, 2]
     -
         - SW_CROSS: [1, 4]
-        - WIRE_SW.W_SW_CROSS_SW_SQUARE: [1, 2]
+        - WIRE_SW.W_SW_SQUARE_SW_CROSS: [1, 2]
     -
         - SW_SQUARE: [1, 4]
-        - W_SW_CROSS_SW_SQUARE: [1, 2]
+        - W_SW_SQUARE_SW_CROSS: [1, 2]
     -
         - SW_SQUARE: [1, 4]
-        - WIRE_SW.W_SW_SQUARE_SW_TRIANGLE: [1, 2]
+        - WIRE_SW.W_SW_TRIANGLE_SW_SQUARE: [1, 2]
     -
         - SW_TRIANGLE: [1, 4]
-        - W_SW_SQUARE_SW_TRIANGLE: [1, 2]
+        - W_SW_TRIANGLE_SW_SQUARE: [1, 2]
 
 # IO BOARD J7 CABLE (LEDS)
     -
-        - J7_IO: [1-5]
+        - J7_IO: [2-6]
         - W5: [1-5]
     -
-        - W5: [1-2]
-        - SW_CIRCLE: [4,3]
+        - W5: [1, 2]
+        - SW_TRIANGLE: [4,3]
     -
         - W5: 3
-        - SW_CROSS: 3
-    -
-        - W5: 4
         - SW_SQUARE: 3
     -
+        - W5: 4
+        - SW_CROSS: 3
+    -
         - W5: 5
-        - SW_TRIANGLE: 3
+        - SW_CIRCLE: 3
