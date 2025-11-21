@@ -9,8 +9,8 @@
 	(paper "A2")
 	(title_block
 		(title "DivaCon Gold Slider")
-		(date "2025-11-14")
-		(rev "1.1")
+		(date "2025-11-21")
+		(rev "1.2")
 		(company "Alexander Knapik")
 	)
 	(layers
@@ -52609,7 +52609,7 @@
 			(justify left bottom)
 		)
 	)
-	(gr_text "LED DATA"
+	(gr_text "nLED DATA"
 		(at 82 127.75 270)
 		(layer "F.SilkS")
 		(uuid "900659a6-60cb-4d5e-9bf4-09af4fda41b6")
@@ -52826,19 +52826,6 @@
 			(justify bottom mirror)
 		)
 	)
-	(gr_text "DATA"
-		(at 28.25 163.75 0)
-		(layer "B.SilkS")
-		(uuid "4f4d4ac8-05dd-437f-af15-105cdfca51bf")
-		(effects
-			(font
-				(size 1.5 1.5)
-				(thickness 0.3)
-				(bold yes)
-			)
-			(justify mirror)
-		)
-	)
 	(gr_text "I2C: 0x5D"
 		(at 503 158.83 0)
 		(layer "B.SilkS")
@@ -52917,8 +52904,8 @@
 			(justify mirror)
 		)
 	)
-	(gr_text "nDATA"
-		(at 71.736 148 90)
+	(gr_text "LED_DATA"
+		(at 71.736 150 90)
 		(layer "B.SilkS")
 		(uuid "caeac4c9-296e-409c-8e9e-45d6493b9509")
 		(effects
