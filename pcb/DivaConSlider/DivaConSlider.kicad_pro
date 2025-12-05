@@ -517,7 +517,7 @@
       "plot": "../gerber/DivaConSlider/",
       "pos_files": "",
       "specctra_dsn": "",
-      "step": "",
+      "step": "../../mech/DivaConSlider.step",
       "svg": "",
       "vrml": ""
     },

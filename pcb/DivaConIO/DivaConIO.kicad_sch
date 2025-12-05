@@ -11990,7 +11990,6 @@
 	(symbol
 		(lib_id "Device:R")
 		(at 331.47 119.38 0)
-		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -11998,7 +11997,7 @@
 		(dnp no)
 		(uuid "5829b5b4-5391-4b23-845b-52152c618c1b")
 		(property "Reference" "R4"
-			(at 330.2 116.84 90)
+			(at 332.74 116.84 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12007,7 +12006,7 @@
 			)
 		)
 		(property "Value" "4K7"
-			(at 330.2 125.73 90)
+			(at 332.74 125.73 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12016,7 +12015,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 333.248 119.38 90)
+			(at 329.692 119.38 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12469,7 +12468,6 @@
 	(symbol
 		(lib_id "Device:R")
 		(at 323.85 119.38 0)
-		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12477,7 +12475,7 @@
 		(dnp no)
 		(uuid "74d69dd0-8064-4878-bb90-2701cb450934")
 		(property "Reference" "R1"
-			(at 322.58 116.84 90)
+			(at 325.12 116.84 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12486,7 +12484,7 @@
 			)
 		)
 		(property "Value" "4K7"
-			(at 322.58 125.73 90)
+			(at 325.12 125.73 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12495,7 +12493,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 325.628 119.38 90)
+			(at 322.072 119.38 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12866,7 +12864,6 @@
 	(symbol
 		(lib_id "Device:R")
 		(at 326.39 119.38 0)
-		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -12874,7 +12871,7 @@
 		(dnp no)
 		(uuid "8f34d750-c028-4f50-ab99-019548db51e7")
 		(property "Reference" "R2"
-			(at 325.12 116.84 90)
+			(at 327.66 116.84 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12883,7 +12880,7 @@
 			)
 		)
 		(property "Value" "4K7"
-			(at 325.12 125.73 90)
+			(at 327.66 125.73 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -12892,7 +12889,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 328.168 119.38 90)
+			(at 324.612 119.38 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14352,7 +14349,6 @@
 	(symbol
 		(lib_id "Device:R")
 		(at 328.93 119.38 0)
-		(mirror y)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -14360,7 +14356,7 @@
 		(dnp no)
 		(uuid "b61e6713-43d4-4073-b538-3cc8ca0ab16c")
 		(property "Reference" "R3"
-			(at 327.66 116.84 90)
+			(at 330.2 116.84 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14369,7 +14365,7 @@
 			)
 		)
 		(property "Value" "4K7"
-			(at 327.66 125.73 90)
+			(at 330.2 125.73 90)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -14378,7 +14374,7 @@
 			)
 		)
 		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
-			(at 330.708 119.38 90)
+			(at 327.152 119.38 90)
 			(effects
 				(font
 					(size 1.27 1.27)
