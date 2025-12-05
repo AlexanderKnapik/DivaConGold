@@ -19,29 +19,29 @@ const Peripherals::Buttons::Config buttons_config = {
         {
             .dpad =
                 {
-                    .up = 18,
-                    .down = 19,
-                    .left = 20,
-                    .right = 21,
+                    .up = 11,
+                    .down = 12,
+                    .left = 4,
+                    .right = 3,
                 },
             .buttons =
                 {
-                    .north = 6,
-                    .east = 9,
-                    .south = 8,
-                    .west = 7,
+                    .north = 16,
+                    .east = 13,
+                    .south = 14,
+                    .west = 15,
 
-                    .l1 = 0,
-                    .l2 = 1,
-                    .l3 = 2,
+                    .l1 = 10,
+                    .l2 = 9,
+                    .l3 = 8,
 
-                    .r1 = 3,
-                    .r2 = 4,
-                    .r3 = 5,
+                    .r1 = 2,
+                    .r2 = 1,
+                    .r3 = 0,
 
-                    .start = 26,
-                    .select = 27,
-                    .home = 22,
+                    .start = 7,
+                    .select = 5,
+                    .home = 6,
                 },
         },
     .mirror_to_dpad = false,
@@ -51,30 +51,19 @@ const Peripherals::Buttons::Config buttons_config = {
 const Peripherals::ButtonLeds::Config button_leds_config = {
     .pins =
         {
-            .north = 10,
-            .east = 13,
-            .south = 12,
-            .west = 11,
+            .north = 28,
+            .east = 22,
+            .south = 26,
+            .west = 27,
         },
     .invert = false,
 };
 
 const Peripherals::TouchSlider::Config touch_slider_config = {
-    .sda_pin = 16,
-    .scl_pin = 17,
-    .i2c_block = i2c0,
-    .i2c_speed_hz = 800000,
-
-    //
-    // Touch controller config, either Mpr121x3, Mpr121x4 or Cap1188
-    //
-
-    // .touch_config =
-    //     Peripherals::TouchSlider::Config::Mpr121x3{
-    //         .i2c_addresses = {0x5A, 0x5D, 0x5C},
-    //         .touch_threshold = 12,
-    //         .release_threshold = 6,
-    //     },
+    .sda_pin = 18,
+    .scl_pin = 19,
+    .i2c_block = i2c1,
+    .i2c_speed_hz = 400000,
 
     .touch_config =
         Peripherals::TouchSlider::Config::Mpr121x4{
@@ -82,17 +71,10 @@ const Peripherals::TouchSlider::Config touch_slider_config = {
             .touch_threshold = 12,
             .release_threshold = 6,
         },
-
-    // .touch_config =
-    //     Peripherals::TouchSlider::Config::Cap1188{
-    //         .i2c_addresses = {0x2C, 0x2B, 0x2A, 0x29},
-    //         .threshold = 64,
-    //         .sensitivity = Cap1188::Sensitivity::S32,
-    //     },
 };
 
 const Peripherals::TouchSliderLeds::Config touch_slider_leds_config = {
-    .led_pin = 28,
+    .led_pin = 17,
     .is_rgbw = false,
     .reverse = true,
     .leds_per_segment = 2,
@@ -108,10 +90,10 @@ const Peripherals::TouchSliderLeds::Config touch_slider_leds_config = {
 };
 
 const Peripherals::Display::Config display_config = {
-    .sda_pin = 14,
-    .scl_pin = 15,
-    .i2c_block = i2c1,
-    .i2c_speed_hz = 1000000,
+    .sda_pin = 20,
+    .scl_pin = 21,
+    .i2c_block = i2c0,
+    .i2c_speed_hz = 400000,
     .i2c_address = 0x3C,
 };
 
