@@ -3,8 +3,8 @@
 #include "peripherals/Display.h"
 #include "peripherals/TouchSlider.h"
 #include "peripherals/TouchSliderLeds.h"
-#include "usb/device/hid/ps4_auth.h"
-#include "usb/device_driver.h"
+// #include "usb/device/hid/ps4_auth.h"
+// #include "usb/device_driver.h"
 #include "utils/InputReport.h"
 #include "utils/InputState.h"
 #include "utils/Menu.h"
@@ -225,48 +225,48 @@ int main() {
     Peripherals::TouchSlider touch_slider(Config::Default::touch_slider_config, mode);
     Utils::Menu menu(settings_store);
 
-    std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response{};
-    if (Config::PS4Auth::config.enabled) {
-        ps4_auth_init(Config::PS4Auth::config.key_pem.c_str(), Config::PS4Auth::config.key_pem.size() + 1,
-                      Config::PS4Auth::config.serial.data(), Config::PS4Auth::config.signature.data(),
-                      [](const uint8_t *challenge) { queue_try_add(&auth_challenge_queue, challenge); });
-    }
+    // std::array<uint8_t, Utils::PS4AuthProvider::SIGNATURE_LENGTH> auth_challenge_response{};
+    // if (Config::PS4Auth::config.enabled) {
+    //     ps4_auth_init(Config::PS4Auth::config.key_pem.c_str(), Config::PS4Auth::config.key_pem.size() + 1,
+    //                   Config::PS4Auth::config.serial.data(), Config::PS4Auth::config.signature.data(),
+    //                   [](const uint8_t *challenge) { queue_try_add(&auth_challenge_queue, challenge); });
+    // }
 
     multicore_launch_core1(core1_task);
 
-    usbd_driver_init(mode);
-    usbd_driver_set_player_led_cb([](usb_player_led_t player_led) {
-        const auto ctrl_message =
-            ControlMessage{.command = ControlCommand::SetPlayerLed, .data = {.player_led = player_led}};
-        queue_try_add(&control_queue, &ctrl_message);
-    });
-    usbd_driver_set_button_led_cb([](usb_button_led_t button_led) {
-        const auto ctrl_message =
-            ControlMessage{.command = ControlCommand::SetButtonLed, .data = {.button_led = button_led}};
-        queue_try_add(&control_queue, &ctrl_message);
-    });
-    usbd_driver_set_slider_led_cb([](const uint8_t *frame, size_t len) {
-        auto led_message = Peripherals::TouchSliderLeds::RawFrameMessage();
+    // usbd_driver_init(mode);
+    // usbd_driver_set_player_led_cb([](usb_player_led_t player_led) {
+    //     const auto ctrl_message =
+    //         ControlMessage{.command = ControlCommand::SetPlayerLed, .data = {.player_led = player_led}};
+    //     queue_try_add(&control_queue, &ctrl_message);
+    // });
+    // usbd_driver_set_button_led_cb([](usb_button_led_t button_led) {
+    //     const auto ctrl_message =
+    //         ControlMessage{.command = ControlCommand::SetButtonLed, .data = {.button_led = button_led}};
+    //     queue_try_add(&control_queue, &ctrl_message);
+    // });
+    // usbd_driver_set_slider_led_cb([](const uint8_t *frame, size_t len) {
+    //     auto led_message = Peripherals::TouchSliderLeds::RawFrameMessage();
 
-        // Colors in `frame` 3 byte in the order: Green, Red, Blue from right
-        // to left (so we need to reverse the order).
-        for (size_t color_idx = 0; color_idx < len / 3; ++color_idx) {
-            if (color_idx >= led_message.size()) {
-                break;
-            }
+    //     // Colors in `frame` 3 byte in the order: Green, Red, Blue from right
+    //     // to left (so we need to reverse the order).
+    //     for (size_t color_idx = 0; color_idx < len / 3; ++color_idx) {
+    //         if (color_idx >= led_message.size()) {
+    //             break;
+    //         }
 
-            led_message.at(led_message.size() - 1 - color_idx) =
-                Peripherals::TouchSliderLeds::TouchSliderLeds::Config::Color{
-                    // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                    .r = frame[(color_idx * 3) + 1],
-                    .g = frame[(color_idx * 3)],
-                    .b = frame[(color_idx * 3) + 2],
-                    // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
-                };
-        }
+    //         led_message.at(led_message.size() - 1 - color_idx) =
+    //             Peripherals::TouchSliderLeds::TouchSliderLeds::Config::Color{
+    //                 // NOLINTBEGIN(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    //                 .r = frame[(color_idx * 3) + 1],
+    //                 .g = frame[(color_idx * 3)],
+    //                 .b = frame[(color_idx * 3) + 2],
+    //                 // NOLINTEND(cppcoreguidelines-pro-bounds-pointer-arithmetic)
+    //             };
+    //     }
 
-        queue_try_add(&led_queue, &led_message);
-    });
+    //     queue_try_add(&led_queue, &led_message);
+    // });
 
     readSettings();
 
@@ -298,14 +298,14 @@ int main() {
             queue_add_blocking(&control_queue, &ctrl_message);
         }
 
-        usbd_driver_send_report(input_report.getReport(input_state, mode));
-        usbd_driver_task();
+        // usbd_driver_send_report(input_report.getReport(input_state, mode));
+        // usbd_driver_task();
 
         queue_try_add(&input_queue, &input_message);
 
-        if (queue_try_remove(&auth_signed_challenge_queue, auth_challenge_response.data())) {
-            ps4_auth_set_signed_challenge(auth_challenge_response.data());
-        }
+        // if (queue_try_remove(&auth_signed_challenge_queue, auth_challenge_response.data())) {
+        //     ps4_auth_set_signed_challenge(auth_challenge_response.data());
+        // }
     }
 
     return 0;
