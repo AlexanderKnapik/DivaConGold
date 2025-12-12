@@ -4,19 +4,6 @@
 
 namespace Divacon::Peripherals {
 
-namespace {
-auto reverseBits = [](uint16_t input) {
-    uint16_t result = 0;
-    uint8_t bit = 0;
-    while (input > 0) {
-        result += (input % 2) << (15 - bit);
-        input >>= 1;
-        bit++;
-    }
-    return result;
-};
-} // namespace
-
 TouchSlider::TouchControllerMpr121x3::TouchControllerMpr121x3(const TouchSlider::Config::Mpr121x3 &config,
                                                               i2c_inst *i2c) {
     size_t idx = 0;
@@ -35,8 +22,8 @@ uint32_t TouchSlider::TouchControllerMpr121x3::read() {
     // Pin     |    0..11    |    2..9     |    0..11    |
     // Touched |   31..20    |   19..12    |    11..0    |
 
-    return (reverseBits(m_mpr121[0]->getTouched()) << 16) | (reverseBits(m_mpr121[1]->getTouched() & 0x03FC) << 6) |
-           (reverseBits(m_mpr121[2]->getTouched()) >> 4);
+    return ((m_mpr121[0]->getTouched()) << 16) | ((m_mpr121[1]->getTouched() & 0x03FC) << 6) |
+           ((m_mpr121[2]->getTouched()) >> 4);
 }
 
 TouchSlider::TouchControllerMpr121x4::TouchControllerMpr121x4(const TouchSlider::Config::Mpr121x4 &config,
@@ -57,10 +44,8 @@ uint32_t TouchSlider::TouchControllerMpr121x4::read() {
     // Pin     |    4..11    |    4..11    |    4..11    |    4..11    |
     // Touched |   31..24    |   23..16    |   15..8     |    7..0     |
 
-    return (reverseBits(m_mpr121[0]->getTouched() & 0x0FF0) << 20) |
-           (reverseBits(m_mpr121[1]->getTouched() & 0x0FF0) << 12) |
-           (reverseBits(m_mpr121[2]->getTouched() & 0x0FF0) << 4) |
-           (reverseBits(m_mpr121[3]->getTouched() & 0x0FF0) >> 4);
+    return ((m_mpr121[0]->getTouched() & 0x0FF0) << 20) | ((m_mpr121[1]->getTouched() & 0x0FF0) << 12) |
+           ((m_mpr121[2]->getTouched() & 0x0FF0) << 4) | ((m_mpr121[3]->getTouched() & 0x0FF0) >> 4);
 }
 
 TouchSlider::TouchControllerCap1188::TouchControllerCap1188(const TouchSlider::Config::Cap1188 &config, i2c_inst *i2c) {
@@ -102,7 +87,7 @@ uint32_t TouchSlider::TouchControllerIs31se5117a::read() {
     // Pin     |       0..15      |       0..15      |
     // Touched |      31..16      |      15..0       |
 
-    return ((reverseBits(m_is31se5117a[0]->getTouched()) << 16) | reverseBits(m_is31se5117a[1]->getTouched()));
+    return (((m_is31se5117a[0]->getTouched()) << 16) | (m_is31se5117a[1]->getTouched()));
 }
 
 TouchSlider::TouchSlider(const Config &config, usb_mode_t mode) : m_config(config), m_mode(mode) {
