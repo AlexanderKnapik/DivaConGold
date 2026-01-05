@@ -2,7 +2,6 @@ cmake_minimum_required(VERSION 3.13)
 
 # Pull in SDK (must be before project)
 include(pico_sdk_import.cmake)
-include(pico_extras_import_optional.cmake)
 
 project(divacon_gold_project VERSION 0.39.0 LANGUAGES C CXX ASM)
 

@@ -36,8 +36,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  cap1188
-  is31se5117a
   mpr121
   hardware_i2c
   pico_multicore
@@ -69,11 +67,9 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   divacon_gold
-  cap1188
   hardware_flash
   hardware_i2c
   hardware_pio
-  is31se5117a
   mpr121
   pico_mbedtls
   pico_ssd1306
