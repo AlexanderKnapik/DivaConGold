@@ -5,7 +5,7 @@
 #include "utils/InputState.h"
 #include "utils/Menu.h"
 
-#include <ssd1306/ssd1306.h>
+#include "pico_ssd1306/ssd1306.h"
 
 #include "hardware/i2c.h"
 

@@ -30,6 +30,7 @@ SOFTWARE.
 
 #ifndef PICO_SSD1306_SSD1306_H_
 #define PICO_SSD1306_SSD1306_H_
+
 #include <hardware/i2c.h>
 #include <pico/stdlib.h>
 

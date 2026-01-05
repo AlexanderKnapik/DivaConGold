@@ -23,6 +23,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "ssd1306.h"
+#include "font.h"
+
 #include <hardware/dma.h>
 #include <hardware/i2c.h>
 #include <pico/binary_info.h>
@@ -30,9 +33,6 @@ SOFTWARE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "font.h"
-#include "ssd1306.h"
 
 inline static void swap(int32_t *a, int32_t *b) {
     int32_t *t = a;
@@ -100,16 +100,27 @@ bool ssd1306_init(ssd1306_t *p, uint16_t width, uint16_t height, uint8_t address
     uint8_t cmds[] = {
         SET_DISP,
         // timing and driving scheme
-        SET_DISP_CLK_DIV, 0x80, SET_MUX_RATIO, height - 1, SET_DISP_OFFSET, 0x00,
+        SET_DISP_CLK_DIV,
+        0x80,
+        SET_MUX_RATIO,
+        height - 1,
+        SET_DISP_OFFSET,
+        0x00,
         // resolution and layout
         SET_DISP_START_LINE,
         // charge pump
-        SET_CHARGE_PUMP, p->external_vcc ? 0x10 : 0x14,
+        SET_CHARGE_PUMP,
+        p->external_vcc ? 0x10 : 0x14,
         SET_SEG_REMAP | 0x01,   // column addr 127 mapped to SEG0
         SET_COM_OUT_DIR | 0x08, // scan from COM[N] to COM0
-        SET_COM_PIN_CFG, width > 2 * height ? 0x02 : 0x12,
+        SET_COM_PIN_CFG,
+        width > 2 * height ? 0x02 : 0x12,
         // display
-        SET_CONTRAST, 0xff, SET_PRECHARGE, p->external_vcc ? 0x22 : 0xF1, SET_VCOM_DESEL,
+        SET_CONTRAST,
+        0xff,
+        SET_PRECHARGE,
+        p->external_vcc ? 0x22 : 0xF1,
+        SET_VCOM_DESEL,
         0x30,          // or 0x40?
         SET_ENTIRE_ON, // output follows RAM contents
         SET_NORM_INV,  // not inverted

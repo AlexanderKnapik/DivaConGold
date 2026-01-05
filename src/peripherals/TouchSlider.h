@@ -3,11 +3,8 @@
 
 #include "utils/InputState.h"
 
+#include "mpr121/Mpr121.h"
 #include "usb/device_driver.h"
-
-#include <cap1188/Cap1188.h>
-#include <is31se5117a/Is31se5117a.h>
-#include <mpr121/Mpr121.h>
 
 #include "hardware/i2c.h"
 
