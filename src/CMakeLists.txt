@@ -32,7 +32,7 @@ pico_enable_stdio_usb(${PROJECT_NAME} ON)
 pico_enable_stdio_uart(${PROJECT_NAME} OFF)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/src>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -64,7 +64,7 @@ pico_enable_stdio_uart(${PROJECT_NAME} OFF)
 pico_add_extra_outputs(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PRIVATE
-  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/src>
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
