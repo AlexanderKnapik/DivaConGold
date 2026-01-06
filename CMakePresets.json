@@ -1,0 +1,63 @@
+{
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "release",
+            "binaryDir": "build",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "PICO_SDK_PATH": "$env{HOME}/.pico-sdk/sdk/2.2.0",
+                "PICOTOOL_FETCH_FROM_GIT_PATH": "$env{HOME}/.pico-sdk/picotool/2.2.0",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+            }
+        },
+        {
+            "name": "debug",
+            "binaryDir": "build",
+            "cacheVariables": {
+                "PICO_SDK_PATH": "$env{HOME}/.pico-sdk/sdk/2.2.0",
+                "PICOTOOL_FETCH_FROM_GIT_PATH": "$env{HOME}/.pico-sdk/picotool/2.2.0",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
+            }
+        },
+        {
+            "name": "test",
+            "binaryDir": "build",
+            "description": "Using compilers: C = /usr/bin/gcc, CXX = /usr/bin/g++",
+            "cacheVariables": {
+                "UNIT_TESTING": true,
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true,
+                "cmocka_DIR": "/usr/lib/cmake/cmocka/",
+                "CMAKE_COMPILER": "/usr/bin/gcc"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "test",
+            "displayName": "Build Unit Tests",
+            "targets": "all",
+            "configurePreset": "test"
+        },
+        {
+            "name": "release",
+            "displayName": "Build Firmware",
+            "targets": "divacon_gold_main",
+            "configurePreset": "release"
+        },
+        {
+            "name": "debug",
+            "displayName": "Build Firmware",
+            "targets": "divacon_gold_main",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "flash",
+            "displayName": "Flash Build Firmware",
+            "targets": "flash_divacon_gold_main",
+            "configurePreset": "release"
+        }
+    ]
+}

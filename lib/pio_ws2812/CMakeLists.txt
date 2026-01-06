@@ -12,12 +12,14 @@ set(HDRS
 
 add_library(pio_ws2812 ${SRCS})
 
-pico_generate_pio_header(${PROJECT_NAME}
-  ${CMAKE_CURRENT_SOURCE_DIR}/ws2812.pio
+if(NOT UNIT_TESTING)
+  pico_generate_pio_header(${PROJECT_NAME}
+    ${CMAKE_CURRENT_SOURCE_DIR}/ws2812.pio
 
-  OUTPUT_DIR
-  ${CMAKE_CURRENT_BINARY_DIR}
-)
+    OUTPUT_DIR
+    ${CMAKE_CURRENT_BINARY_DIR}
+  )
+endif()
 
 target_include_directories(${PROJECT_NAME}
   PUBLIC

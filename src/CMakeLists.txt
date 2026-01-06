@@ -47,6 +47,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   # tinyusb_device
   # tinyusb_board
 )
+# if(NOT UNIT_TESTING)
+#   pico_enable_stdio_usb(${PROJECT_NAME} OFF)
+#   pico_enable_stdio_uart(${PROJECT_NAME} ON)
+# endif()
+
 
 project(divacon_gold_main VERSION 0.39.0 LANGUAGES ASM C CXX)
 
@@ -56,10 +61,17 @@ set(SRCS
 
 add_executable(${PROJECT_NAME} ${SRCS})
 
-pico_enable_stdio_usb(${PROJECT_NAME} ON)
-pico_enable_stdio_uart(${PROJECT_NAME} OFF)
-# create map/bin/hex/uf2 file in addition to ELF.
-pico_add_extra_outputs(${PROJECT_NAME})
+if(NOT UNIT_TESTING)
+  pico_enable_stdio_usb(${PROJECT_NAME} OFF)
+  pico_enable_stdio_uart(${PROJECT_NAME} ON)
+
+  # create map/bin/hex/uf2 file in addition to ELF.
+  pico_add_extra_outputs(${PROJECT_NAME})
+endif()
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
 
 target_include_directories(${PROJECT_NAME} PRIVATE
   $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/src>
