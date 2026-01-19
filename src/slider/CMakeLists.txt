@@ -8,9 +8,9 @@ set(SRCS
   # arcade_stick.c
   colour.c
   # mpr121.c
-  palette_buffer.c
   # slider.c
   # slider_leds.c
+  pattern_buffer.c
 )
 
 set(HDRS
@@ -19,9 +19,9 @@ set(HDRS
   # arcade_stick.c
   colour.h
   # mpr121.h
-  palette_buffer.c
   # slider.h
   # slider_leds.h
+  pattern_buffer.c
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})

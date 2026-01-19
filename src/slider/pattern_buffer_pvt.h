@@ -1,5 +1,5 @@
-#ifndef PALETTE_BUFFER_PVT_H_
-#define PALETTE_BUFFER_PVT_H_
+#ifndef PATTERN_BUFFER_PVT_H_
+#define PATTERN_BUFFER_PVT_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -10,7 +10,7 @@ extern "C" {
 #include <stdint.h>
 
 /**
- * @brief A read-only circular buffer for holding an animation colour palette.
+ * @brief A read-only circular buffer for holding an animation colour pattern.
  *
  * Not to be included by source code, this privately defined for unit test
  * access.
@@ -19,7 +19,7 @@ extern "C" {
  * @param size The maximum size of the circular buffer.
  * @param read The current position of the read pointer within the buffer.
  */
-struct palette_buffer_handle {
+struct pattern_buffer_handle {
     const struct colour *buf;
     uint16_t size;
     uint16_t read;
@@ -29,4 +29,4 @@ struct palette_buffer_handle {
 }
 #endif
 
-#endif // PALETTE_BUFFER_PVT_H_
+#endif // PATTERN_BUFFER_PVT_H_
