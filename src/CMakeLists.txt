@@ -1,62 +1,67 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(divacon_gold VERSION 0.39.0 LANGUAGES ASM C CXX)
+project(divacon_gold_src)
 
-set(SRCS
-  peripherals/ButtonLeds.cpp
-  peripherals/Buttons.cpp
-  peripherals/Display.cpp
-  peripherals/TouchSlider.cpp
-  peripherals/TouchSliderLeds.cpp
-  # usb/device/hid/common.c
-  # usb/device/hid/keyboard_driver.c
-  # usb/device/hid/ps3_driver.c
-  # usb/device/hid/ps4_auth.c
-  # usb/device/hid/ps4_driver.c
-  # usb/device/hid/switch_driver.c
-  # usb/device/vendor/common.c
-  # usb/device/vendor/debug_driver.c
-  # usb/device/vendor/pdloader_driver.c
-  # usb/device/vendor/xinput_driver.c
-  # usb/device/midi_driver.c
-  # usb/device_driver.c
-  utils/InputReport.cpp
-  utils/Menu.cpp
-  utils/PS4AuthProvider.cpp
-  utils/SettingsStore.cpp
-)
+add_subdirectory(common)
+add_subdirectory(buttons)
+add_subdirectory(menu)
+add_subdirectory(slider)
 
-add_library(${PROJECT_NAME} ${SRCS})
+# project(divacon_gold VERSION 0.39.0 LANGUAGES ASM C CXX)
 
-pico_enable_stdio_usb(${PROJECT_NAME} ON)
-pico_enable_stdio_uart(${PROJECT_NAME} OFF)
+# set(SRCS
+#   peripherals/ButtonLeds.cpp
+#   peripherals/Buttons.cpp
+#   peripherals/Display.cpp
+#   peripherals/TouchSlider.cpp
+#   peripherals/TouchSliderLeds.cpp
+#   usb/device_driver.c
+#   usb/device/hid/common.c
+#   usb/device/hid/keyboard_driver.c
+#   # usb/device/hid/ps3_driver.c
+#   # usb/device/hid/ps4_auth.c
+#   # usb/device/hid/ps4_driver.c
+#   # usb/device/hid/switch_driver.c
+#   # usb/device/vendor/common.c
+#   # usb/device/vendor/debug_driver.c
+#   # usb/device/vendor/pdloader_driver.c
+#   # usb/device/vendor/xinput_driver.c
+#   # usb/device/midi_driver.c
+#   utils/InputReport.cpp
+#   utils/Menu.cpp
+#   # utils/PS4AuthProvider.cpp
+#   utils/SettingsStore.cpp
+#   tusb_config.h
+# )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/src>
-)
+# add_library(${PROJECT_NAME} ${SRCS})
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  mpr121
-  hardware_i2c
-  pico_multicore
-  pico_rand
-  pico_ssd1306
-  pico_stdlib
-  pio_ws2812
-  pico_mbedtls
-  # tinyusb_device
-  # tinyusb_board
-)
 # if(NOT UNIT_TESTING)
 #   pico_enable_stdio_usb(${PROJECT_NAME} OFF)
 #   pico_enable_stdio_uart(${PROJECT_NAME} ON)
 # endif()
 
+# target_include_directories(${PROJECT_NAME} PUBLIC
+#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+# )
+
+# target_link_libraries(${PROJECT_NAME} PRIVATE
+#   mpr121
+#   hardware_i2c
+#   pico_multicore
+#   pico_rand
+#   pico_ssd1306
+#   pico_stdlib
+#   pio_ws2812
+#   pico_mbedtls
+#   tinyusb_device
+#   tinyusb_board
+# )
 
 project(divacon_gold_main VERSION 0.39.0 LANGUAGES ASM C CXX)
 
 set(SRCS
-  main.cpp
+  main.c
 )
 
 add_executable(${PROJECT_NAME} ${SRCS})
