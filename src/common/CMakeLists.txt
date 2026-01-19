@@ -5,6 +5,7 @@ project(divacon-common VERSION 0.0.1 LANGUAGES C)
 set(SRCS
   systick.c
   util.c
+  version.c
 )
 
 set(HDRS
@@ -12,6 +13,7 @@ set(HDRS
   error.h
   systick.h
   util.h
+  version.h
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})

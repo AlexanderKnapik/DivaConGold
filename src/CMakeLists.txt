@@ -7,7 +7,7 @@ add_subdirectory(buttons)
 add_subdirectory(menu)
 add_subdirectory(slider)
 
-project(divacon_gold_main VERSION 0.39.0 LANGUAGES ASM C CXX)
+project(divacon_gold_main VERSION 0.0.1 LANGUAGES ASM C CXX)
 
 set(SRCS
   main.c
