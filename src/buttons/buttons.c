@@ -2,6 +2,7 @@
 
 #include "buttons/button_led.h"
 #include "common/bsp.h"
+#include "common/buttons_common.h"
 #include "common/error.h"
 #include "common/util.h"
 

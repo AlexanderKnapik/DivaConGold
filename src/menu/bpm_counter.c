@@ -1,6 +1,6 @@
 #include "bpm_counter.h"
 
-#include "buttons/buttons.h"
+#include "common/buttons_common.h"
 #include "common/systick.h"
 #include "menu/bpm_buffer.h"
 
