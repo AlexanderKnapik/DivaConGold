@@ -4,6 +4,7 @@ project(divacon-common VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
   systick.c
+  util.c
 )
 
 set(HDRS
