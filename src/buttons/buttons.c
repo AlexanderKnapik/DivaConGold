@@ -10,8 +10,8 @@
 
 #include <stdint.h>
 
-#define BUTTON_COUNTER_THRESHOLD (3U) /* Consequetive readings for a state change */
-#define BUTTON_ACTIVE_LEVEL (0U)      /* Buttons are active Low */
+/* Consecutive readings required for a state change */
+#define BUTTON_COUNTER_THRESHOLD (3U)
 
 /**
  * @brief The internal state to initialise and debounce a button
@@ -76,10 +76,11 @@ static struct button_states button_states = {
 
 /* Array to allow indexing through the button_states struct */
 static struct button_state *button_states_array[] = {
-    &button_states.triangle, &button_states.square, &button_states.cross, &button_states.circle, &button_states.up,
-    &button_states.down,     &button_states.left,   &button_states.right, &button_states.l1,     &button_states.l2,
-    &button_states.l3,       &button_states.r1,     &button_states.r2,    &button_states.r3,     &button_states.start,
-    &button_states.select,   &button_states.home,
+    &button_states.triangle, &button_states.square, &button_states.cross, &button_states.circle,
+    &button_states.up,       &button_states.down,   &button_states.left,  &button_states.right,
+    &button_states.l1,       &button_states.l2,     &button_states.l3,    &button_states.r1,
+    &button_states.r2,       &button_states.r3,     &button_states.start, &button_states.select,
+    &button_states.home,
 };
 
 /*
@@ -112,11 +113,7 @@ void buttons_init(void)
 
 static bool is_button_set(const struct button_state *button)
 {
-    if (button->counter >= BUTTON_COUNTER_THRESHOLD) {
-        return true;
-    }
-
-    return false;
+    return (button->counter >= BUTTON_COUNTER_THRESHOLD);
 }
 
 const struct buttons *buttons_read(void)
@@ -162,38 +159,27 @@ const struct buttons *buttons_read(void)
 
 static bool read_button_pin(const struct button_state *button)
 {
-    if (!button) {
-        return false;
-    }
-
-    return (bool)(gpio_get(button->pin) == BUTTON_ACTIVE_LEVEL);
+    return (gpio_get(button->pin) == (bool)BUTTON_ACTIVE_LEVEL);
 }
 
-static enum error update_button_counter(struct button_state *button, bool state)
+static void update_button_counter(struct button_state *button, bool state)
 {
-    if (!button) {
-        return E_NULL_POINTER;
-    }
-
     if (state) {
         button->counter++;
     }
     else {
         button->counter = 0;
     }
-
-    button_led_write(button->led, is_button_set(button));
-
-    return E_SUCCESS;
 }
 
-const struct buttons *buttons_ioctl_update(void)
+const struct buttons *buttons_update(void)
 {
     const uint8_t num_buttons = ARRAY_SIZE(button_states_array);
 
     for (uint8_t idx = 0; idx < num_buttons; idx++) {
         struct button_state *button = button_states_array[idx];
         update_button_counter(button, read_button_pin(button));
+        button_led_write(button->led, is_button_set(button));
     }
 
     return buttons_read();

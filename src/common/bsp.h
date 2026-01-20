@@ -1,3 +1,6 @@
+/*****************************************************************************/
+/*                Board Support Package Hardware Configuration               */
+/*****************************************************************************/
 #ifndef BSP_H_
 #define BSP_H_
 
@@ -5,6 +8,10 @@
 extern "C" {
 #endif
 
+
+/* 0 is active low, 1 is active high */
+#define BUTTON_ACTIVE_LEVEL (0U)
+#define BUTTON_LED_ACTIVE_LEVEL (1U)
 #define BUTTON_R1_Pin (2U)
 #define BUTTON_R2_Pin (1U)
 #define BUTTON_R3_Pin (0U)

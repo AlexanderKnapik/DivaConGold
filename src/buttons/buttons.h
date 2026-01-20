@@ -1,3 +1,6 @@
+/*****************************************************************************/
+/*                    Reading the controller face buttons                    */
+/*****************************************************************************/
 #ifndef BUTTONS_H_
 #define BUTTONS_H_
 
@@ -6,7 +9,6 @@ extern "C" {
 #endif
 
 #include "common/buttons_common.h"
-#include "common/error.h"
 
 #include <stdbool.h>
 
@@ -17,6 +19,8 @@ void buttons_init();
 
 /**
  * @brief Read the current state of the pressed buttons.
+ *
+ * @return The current state of the buttons.
  */
 const struct buttons *buttons_read(void);
 
@@ -25,7 +29,7 @@ const struct buttons *buttons_read(void);
  *
  * @return The current state of the buttons.
  */
-const struct buttons *buttons_ioctl_update(void);
+const struct buttons *buttons_update(void);
 
 #ifdef __cplusplus
 }

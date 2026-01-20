@@ -8,8 +8,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#define BUTTON_LED_ACTIVE_LEVEL (1U)
-
 /**
  * @brief Get the GPIO pin number given the specified LED enum value.
  *
@@ -74,7 +72,7 @@ enum error button_led_read(enum button_led led, bool *state)
     const enum error err = get_led_pin(led, &pin);
 
     if (state && err == E_SUCCESS) {
-        *state = (bool)(gpio_get(pin) == BUTTON_LED_ACTIVE_LEVEL);
+        *state = (gpio_get(pin) == (bool)BUTTON_LED_ACTIVE_LEVEL);
     }
 
     return err;
@@ -86,8 +84,7 @@ enum error button_led_write(enum button_led led, bool state)
     const enum error err = get_led_pin(led, &pin);
 
     if (err == E_SUCCESS) {
-        const bool write_state = (state == BUTTON_LED_ACTIVE_LEVEL) ? true : false;
-        gpio_put(pin, write_state);
+        gpio_put(pin, (state == (bool)BUTTON_LED_ACTIVE_LEVEL));
     }
 
     return err;
