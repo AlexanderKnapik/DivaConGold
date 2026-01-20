@@ -6,6 +6,7 @@ add_subdirectory(common)
 add_subdirectory(buttons)
 add_subdirectory(menu)
 add_subdirectory(slider)
+add_subdirectory(system)
 
 project(divacon_gold_main VERSION 0.0.1 LANGUAGES ASM C CXX)
 
@@ -27,22 +28,14 @@ target_include_directories(${PROJECT_NAME} PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
-target_include_directories(${PROJECT_NAME} PRIVATE
-  $<BUILD_INTERFACE:${divacon_gold_project_SOURCE_DIR}/src>
-)
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  divacon-common
+  divacon-system
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  divacon_gold
-  hardware_flash
-  hardware_i2c
-  hardware_pio
-  mpr121
-  pico_mbedtls
-  pico_ssd1306
   pico_stdlib
-  # tinyusb_device
 )
 
+# flash_divacon_gold_main CMake target
 # Target to flash the firmware using Pico SDK OpenOCD Version
 set(OPENOCD_PATH "${PICO_SDK_PATH}/../../openocd/0.12.0+dev" CACHE PATH "Path to the PicoSDK OpenOCD executable")
 

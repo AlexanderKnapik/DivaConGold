@@ -1,17 +1,13 @@
 cmake_minimum_required(VERSION 3.28)
 
-project(divacon-common VERSION 0.0.1 LANGUAGES C)
+project(divacon-system VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
-  util.c
-  version.c
+  systick.c
 )
 
 set(HDRS
-  bsp.h
-  error.h
-  util.h
-  version.h
+  systick.h
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
@@ -24,6 +20,6 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${divacon_gold_src_SOURCE_DIR}>
 )
 
-set_target_properties(${PROJECT_NAME} PROPERTIES
-  LINKER_LANGUAGE C
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pico_time>
 )
