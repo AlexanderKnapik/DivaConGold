@@ -39,6 +39,11 @@ else()
   endif()
 
   set(PICO_USE_FASTEST_SUPPORTED_CLOCK ON)
+
+  if(NOT DEFINED PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS)
+    set(PICO_STDIO_USB_CONNECT_WAIT_TIMEOUT_MS 1000)
+  endif()
+
   pico_sdk_init()
 endif()
 

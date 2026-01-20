@@ -17,11 +17,20 @@ set(SRCS
 add_executable(${PROJECT_NAME} ${SRCS})
 
 if(NOT UNIT_TESTING)
-  pico_enable_stdio_usb(${PROJECT_NAME} OFF)
-  pico_enable_stdio_uart(${PROJECT_NAME} ON)
+  pico_enable_stdio_usb(${PROJECT_NAME} ON)
+  pico_enable_stdio_uart(${PROJECT_NAME} OFF)
 
   # create map/bin/hex/uf2 file in addition to ELF.
   pico_add_extra_outputs(${PROJECT_NAME})
+
+  # Fix for Errata RP2040-E5 (the fix requires use of GPIO 15)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC
+    PICO_RP2040_USB_DEVICE_ENUMERATION_FIX=1
+  )
+
+  if(PICO_ON_DEVICE)
+    message("TinyUSB submodule not initialised in Pico SDK.")
+  endif()
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC
