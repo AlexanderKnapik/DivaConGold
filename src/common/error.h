@@ -1,3 +1,6 @@
+/*****************************************************************************/
+/*                            Project Error Types                            */
+/*****************************************************************************/
 #ifndef ERROR_H_
 #define ERROR_H_
 
@@ -11,6 +14,11 @@ enum error {
     E_NULL_POINTER,
     E_BUFFER_FULL,
     E_BUFFER_SIZE,
+    E_HARDWARE,
+    E_NOT_IMPLEMENTED,
+    E_IO,
+    E_INVALID_STATE,
+    E_TIMEOUT,
 };
 
 #ifdef __cplusplus

@@ -37,9 +37,9 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   divacon-common
+  divacon-peripheral
 
   $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pico_stdlib>
-  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:hardware_i2c>
   $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pio_ws2812>
 )
 
