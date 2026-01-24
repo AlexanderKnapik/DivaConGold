@@ -3,12 +3,14 @@ cmake_minimum_required(VERSION 3.28)
 project(divacon-slider VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
+  animation.c
   colour.c
   mpr121.c
   pattern_buffer.c
 )
 
 set(HDRS
+  animation.h
   colour.h
   mpr121.h
   pattern_buffer.c

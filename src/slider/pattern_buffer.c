@@ -26,17 +26,11 @@ pattern_buffer_handle_t pattern_buffer_open(const struct colour *colours, uint16
     return pattern;
 }
 
-enum error pattern_buffer_close(pattern_buffer_handle_t pattern)
+void pattern_buffer_close(pattern_buffer_handle_t pattern)
 {
-    if (!pattern) {
-        return E_NULL_POINTER;
-    }
-
     if (pattern) {
         free(pattern);
     }
-
-    return E_SUCCESS;
 }
 
 static struct colour *pal_buf_copy(pattern_buffer_const_handle_t pattern, const uint16_t read_idx,

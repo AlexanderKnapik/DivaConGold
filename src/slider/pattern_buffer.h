@@ -1,3 +1,6 @@
+/*****************************************************************************/
+/*         Circular Buffer for Storing an LED Strip Animation Pattern        */
+/*****************************************************************************/
 #ifndef PATTERN_BUFFER_H_
 #define PATTERN_BUFFER_H_
 
@@ -37,9 +40,8 @@ pattern_buffer_handle_t pattern_buffer_open(const struct colour *colours, uint16
  * @brief De-initialise a pattern buffer.
  *
  * @param [in] pattern The pattern buffer to de-initialise.
- * @return Error Code.
  */
-enum error pattern_buffer_close(pattern_buffer_handle_t pattern);
+void pattern_buffer_close(pattern_buffer_handle_t pattern);
 
 /**
  * @brief Read the colours from a pattern buffer into a colours array.
