@@ -5,15 +5,11 @@
 extern "C" {
 #endif
 
+#include "common/colour_common.h"
+
 #include <stdint.h>
 
-struct colour {
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-};
-
-extern const struct colour rainbow_colours[];
+extern const struct colour rainbow_colours[80];
 
 #ifdef __cplusplus
 }

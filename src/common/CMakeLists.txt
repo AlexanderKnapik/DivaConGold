@@ -9,6 +9,7 @@ set(SRCS
 
 set(HDRS
   bsp.h
+  colour_common.h
   error.h
   util.h
   version.h
