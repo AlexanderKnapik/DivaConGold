@@ -47,3 +47,14 @@ uint64_t max_n_bit_value_u64(uint8_t n)
 {
     return (UINT64_MAX >> (UINT64_WIDTH - n));
 }
+
+uint16_t byte_array_to_u16(const uint8_t array[2])
+{
+    uint16_t val = 0;
+
+    val |= (uint16_t)array[1];
+    val <<= UINT8_WIDTH;
+    val |= (uint16_t)array[0];
+
+    return val;
+}

@@ -10,14 +10,15 @@ extern "C" {
 
 enum error {
     E_SUCCESS = 0,
-    E_INVALID_INPUT,
+    E_GENERIC,
+    E_NOT_IMPLEMENTED,
     E_NULL_POINTER,
+    E_INVALID_INPUT,
+    E_INVALID_STATE,
     E_BUFFER_FULL,
     E_BUFFER_SIZE,
     E_HARDWARE,
-    E_NOT_IMPLEMENTED,
     E_IO,
-    E_INVALID_STATE,
     E_TIMEOUT,
 };
 

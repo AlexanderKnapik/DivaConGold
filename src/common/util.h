@@ -92,6 +92,11 @@ uint32_t max_n_bit_value_u32(uint8_t n);
  */
 uint64_t max_n_bit_value_u64(uint8_t n);
 
+/**
+ * @brief Convert a u8 array into a u16 int.
+ */
+uint16_t byte_array_to_u16(const uint8_t array[2]);
+
 #ifdef __cplusplus
 }
 #endif

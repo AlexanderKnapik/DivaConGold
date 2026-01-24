@@ -9,6 +9,8 @@ extern "C" {
 #endif
 
 
+#define MPR121_I2C_TIMEOUT_MS (100U)
+
 /* 0 is active low, 1 is active high */
 #define BUTTON_ACTIVE_LEVEL (0U)
 #define BUTTON_LED_ACTIVE_LEVEL (1U)

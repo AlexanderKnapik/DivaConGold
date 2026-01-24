@@ -6,6 +6,7 @@ add_subdirectory(buttons)
 add_subdirectory(common)
 add_subdirectory(log)
 add_subdirectory(menu)
+add_subdirectory(peripheral)
 add_subdirectory(slider)
 add_subdirectory(system)
 
@@ -41,6 +42,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   divacon-common
   divacon-log
+  divacon-slider
   divacon-system
 
   pico_stdlib

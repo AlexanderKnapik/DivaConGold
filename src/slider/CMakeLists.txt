@@ -3,24 +3,14 @@ cmake_minimum_required(VERSION 3.28)
 project(divacon-slider VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
-  # analogue_stick.c
-  # animation.c
-  # arcade_stick.c
   colour.c
-  # mpr121.c
-  # slider.c
-  # slider_leds.c
+  mpr121.c
   pattern_buffer.c
 )
 
 set(HDRS
-  # analogue_stick.c
-  # animation.h
-  # arcade_stick.c
   colour.h
-  # mpr121.h
-  # slider.h
-  # slider_leds.h
+  mpr121.h
   pattern_buffer.c
 )
 
