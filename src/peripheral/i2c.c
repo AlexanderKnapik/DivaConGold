@@ -35,13 +35,13 @@ enum error i2c_close(i2c_inst_t *i2c)
     return E_SUCCESS;
 }
 
-enum error get_error_code(int val, uint16_t size)
+enum error get_error_code(enum pico_error_codes error, uint16_t size)
 {
-    if (val == size) {
+    if (error == size) {
         return E_SUCCESS;
     }
 
-    if (val == PICO_ERROR_TIMEOUT) {
+    if (error == PICO_ERROR_TIMEOUT) {
         return E_TIMEOUT;
     }
 
@@ -62,7 +62,7 @@ static enum error internal_write(i2c_inst_t *i2c, uint8_t address, const uint8_t
     const enum error err =
         i2c_write_timeout_us(i2c, address, data, size, no_stop, (uint)(timeout_ms * 1000));
 
-    return get_error_code(err, size);
+    return get_error_code((enum pico_error_codes)err, size);
 }
 
 enum error i2c_write(i2c_inst_t *i2c, uint8_t address, const uint8_t *data, uint16_t size,
@@ -86,7 +86,7 @@ enum error i2c_read(i2c_inst_t *i2c, uint8_t address, uint8_t *data, uint16_t si
     const enum error err =
         i2c_read_timeout_us(i2c, address, data, size, false, (uint)(timeout_ms * 1000));
 
-    return get_error_code(err, size);
+    return get_error_code((enum pico_error_codes)err, size);
 }
 
 enum error i2c_transfer(i2c_inst_t *i2c, uint8_t address, const uint8_t *src, uint16_t src_size,
