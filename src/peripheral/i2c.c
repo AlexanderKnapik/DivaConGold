@@ -24,15 +24,10 @@ i2c_inst_t *i2c_open(const struct i2c_config *config)
     return config->instance;
 }
 
-enum error i2c_close(i2c_inst_t *i2c)
+void i2c_close(i2c_inst_t *i2c)
 {
-    if (!i2c) {
-        return E_NULL_POINTER;
-    }
-
+    /* I2C instance already closed, exit early. */
     i2c_deinit(i2c);
-
-    return E_SUCCESS;
 }
 
 enum error get_error_code(enum pico_error_codes error, uint16_t size)

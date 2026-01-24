@@ -43,11 +43,9 @@ i2c_inst_t *i2c_open(const struct i2c_config *config);
  * initialise the GPIO pins as necessary.
  *
  * @param [in] i2c The I2C instance to de-initialise.
- * @return Error code.
- * @retval E_SUCCESS Success.
- * @retval E_NULL_POINTER Null i2c.
+ * @return None.
  */
-enum error i2c_close(i2c_inst_t *i2c);
+void i2c_close(i2c_inst_t *i2c);
 
 /**
  * @brief Write data to the I2C instance with a timeout.
