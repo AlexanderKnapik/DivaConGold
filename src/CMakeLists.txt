@@ -2,8 +2,9 @@ cmake_minimum_required(VERSION 3.28)
 
 project(divacon_gold_src)
 
-add_subdirectory(common)
 add_subdirectory(buttons)
+add_subdirectory(common)
+add_subdirectory(log)
 add_subdirectory(menu)
 add_subdirectory(slider)
 add_subdirectory(system)
@@ -39,6 +40,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   divacon-common
+  divacon-log
   divacon-system
 
   pico_stdlib

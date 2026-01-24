@@ -1,4 +1,4 @@
-#include "common/version.h"
+#include "log/log.h"
 
 #include <pico/stdlib.h>
 
@@ -6,8 +6,7 @@
 
 int main()
 {
-    stdio_init_all();
-    printf("Version: %u.%u.%u", version.major, version.minor, version.patch);
+    log_open(NULL);
 
     while (true) {
         sleep_ms(1);
