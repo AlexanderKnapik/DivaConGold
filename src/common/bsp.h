@@ -12,6 +12,8 @@ extern "C" {
 /* 0 is active low, 1 is active high */
 #define BUTTON_ACTIVE_LEVEL (0U)
 #define BUTTON_LED_ACTIVE_LEVEL (1U)
+
+#define I2C_SLEW_RATE (GPIO_SLEW_RATE_HIGH)
 #define BUTTON_R1_Pin (2U)
 #define BUTTON_R2_Pin (1U)
 #define BUTTON_R3_Pin (0U)

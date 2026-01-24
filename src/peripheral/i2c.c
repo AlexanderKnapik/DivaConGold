@@ -1,5 +1,6 @@
 #include "i2c.h"
 
+#include "common/bsp.h"
 #include "common/error.h"
 
 #include <hardware/gpio.h>
@@ -15,11 +16,23 @@ i2c_inst_t *i2c_open(const struct i2c_config *config)
         return NULL;
     }
 
-    i2c_init(config->instance, config->speed_hz);
-    gpio_set_function(config->sda_pin, GPIO_FUNC_I2C);
-    gpio_set_function(config->scl_pin, GPIO_FUNC_I2C);
-    gpio_pull_up(config->sda_pin);
-    gpio_pull_up(config->scl_pin);
+    /*
+     * If the I2C instance is already initialised, don't attempt to
+     * re-initialise it. Just return the instance instead.
+     *
+     * I'm pretty sure this causes issues with the MPR121 I2C bus getting
+     * stuck on boot if initialised multiple times.
+     */
+    if (!config->instance->hw->enable) {
+        i2c_init(config->instance, config->speed_hz);
+
+        gpio_set_function(config->sda_pin, GPIO_FUNC_I2C);
+        gpio_set_function(config->scl_pin, GPIO_FUNC_I2C);
+        gpio_pull_up(config->sda_pin);
+        gpio_pull_up(config->scl_pin);
+        gpio_set_slew_rate(config->sda_pin, I2C_SLEW_RATE);
+        gpio_set_slew_rate(config->scl_pin, I2C_SLEW_RATE);
+    }
 
     return config->instance;
 }
