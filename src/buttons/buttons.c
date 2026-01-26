@@ -167,7 +167,9 @@ static bool read_button_pin(const struct button_state *button)
 static void update_button_counter(struct button_state *button, bool state)
 {
     if (state) {
-        button->counter++;
+        if (button->counter < UINT8_MAX) {
+            button->counter++;
+        }
     }
     else {
         button->counter = 0;
@@ -181,6 +183,8 @@ const struct buttons *buttons_update(void)
     for (uint8_t idx = 0; idx < num_buttons; idx++) {
         struct button_state *button = button_states_array[idx];
         update_button_counter(button, read_button_pin(button));
+
+        /* TODO: Error check */
         button_led_write(button->led, is_button_set(button));
     }
 
