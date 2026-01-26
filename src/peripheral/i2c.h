@@ -10,6 +10,8 @@ extern "C" {
 
 #include "common/error.h"
 
+#include <hardware/gpio.h>
+
 #include <stdint.h>
 
 /*
@@ -24,6 +26,8 @@ struct i2c_config {
     uint32_t speed_hz;
     uint8_t sda_pin;
     uint8_t scl_pin;
+    enum gpio_slew_rate slew;
+    enum gpio_drive_strength drive;
 };
 
 /**

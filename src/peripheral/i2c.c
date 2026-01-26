@@ -27,11 +27,14 @@ i2c_inst_t *i2c_open(const struct i2c_config *config)
         i2c_init(config->instance, config->speed_hz);
 
         gpio_set_function(config->sda_pin, GPIO_FUNC_I2C);
-        gpio_set_function(config->scl_pin, GPIO_FUNC_I2C);
+        gpio_set_drive_strength(config->sda_pin, config->drive);
         gpio_pull_up(config->sda_pin);
+        gpio_set_slew_rate(config->sda_pin, config->slew);
+
+        gpio_set_function(config->scl_pin, GPIO_FUNC_I2C);
         gpio_pull_up(config->scl_pin);
-        gpio_set_slew_rate(config->sda_pin, I2C_SLEW_RATE);
-        gpio_set_slew_rate(config->scl_pin, I2C_SLEW_RATE);
+        gpio_set_slew_rate(config->scl_pin, config->slew);
+        gpio_set_drive_strength(config->scl_pin, config->drive);
     }
 
     return config->instance;

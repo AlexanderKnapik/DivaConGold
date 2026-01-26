@@ -52,7 +52,9 @@ static enum error init_led(enum button_led led)
         gpio_init(pin);
         gpio_pull_up(pin);
         gpio_set_dir(pin, true);
-        gpio_put(pin, !(bool)BUTTON_LED_ACTIVE_LEVEL);
+        gpio_put(pin, !((bool)BUTTON_LED_ACTIVE_LEVEL));
+        gpio_set_slew_rate(pin, BUTTON_LED_SLEW_RATE);
+        gpio_set_drive_strength(pin, BUTTON_LED_DRIVE_STRENGTH);
     }
 
     return err;

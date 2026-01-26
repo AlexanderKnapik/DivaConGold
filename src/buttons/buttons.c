@@ -105,6 +105,8 @@ void buttons_init(void)
         gpio_init(button->pin);
         gpio_pull_up(button->pin);
         gpio_set_dir(button->pin, false); /* input */
+        gpio_set_slew_rate(button->pin, BUTTON_SLEW_RATE);
+        gpio_set_drive_strength(button->pin, BUTTON_DRIVE_STRENGTH);
 
         /* Reset the counter value */
         button->counter = 0;
