@@ -4,15 +4,18 @@ project(divacon-common VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
   slider_leds_common.c
+  usb_common.c
   util.c
   version.c
 )
 
 set(HDRS
   bsp.h
+  buttons_common.h
   colour_common.h
   error.h
   slider_leds_common.h
+  usb_common.h
   util.h
   version.h
 )
