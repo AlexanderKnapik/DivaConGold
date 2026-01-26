@@ -20,11 +20,9 @@ target_include_directories(${PROJECT_NAME}
     $<BUILD_INTERFACE:${divacon_gold_src_SOURCE_DIR}>
 )
 
-target_link_libraries(${PROJECT_NAME}
-    PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
     divacon-common
 
-    PRIVATE
     $<$<NOT:$<BOOL:${UNIT_TESTING}>>:hardware_i2c>
 )
 

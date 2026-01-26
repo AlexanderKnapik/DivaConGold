@@ -16,8 +16,11 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  pico_stdlib
+target_link_libraries(${PROJECT_NAME}
+  PUBLIC
   hardware_i2c
   hardware_dma
+
+  PRIVATE
+  pico_stdlib
 )

@@ -22,8 +22,9 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${divacon_gold_src_SOURCE_DIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
   divacon-common
+
   pico_stdlib
 )
 

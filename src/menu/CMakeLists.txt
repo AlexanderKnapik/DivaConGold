@@ -3,13 +3,9 @@ cmake_minimum_required(VERSION 3.28)
 project(divacon-menu VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
-  bpm_buffer.c
-  bpm_counter.c
 )
 
 set(HDRS
-  bpm_buffer.h
-  bpm_counter.h
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
@@ -22,8 +18,11 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${divacon_gold_src_SOURCE_DIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
   divacon-common
-  pico_stdlib
+  divacon-peripheral
+
+  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pico_stdlib>
+  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pico_ssd1306>
 )
 
