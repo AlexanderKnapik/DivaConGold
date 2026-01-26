@@ -134,6 +134,8 @@ struct mpr121_config {
     /* Filter and Global CDC/CDR Configuration (0x5C, 0x5D) */
     enum mpr121_first_filter_samples first_filter_samples;
     enum mpr121_second_filter_samples second_filter_samples;
+
+    /* If auto_configure is true, the MPR121 will set these values instead */
     uint8_t charge_discharge_current_uA; /* 0 to 63 */
     enum mpr121_charge_discharge_time charge_discharge_time;
     enum mpr121_sample_interval sample_interval;

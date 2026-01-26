@@ -7,6 +7,7 @@ set(SRCS
   colour.c
   mpr121.c
   pattern_buffer.c
+  slider.c
   slider_leds.c
 )
 
@@ -15,6 +16,7 @@ set(HDRS
   colour.h
   mpr121.h
   pattern_buffer.c
+  slider.h
   slider_leds.h
 )
 
