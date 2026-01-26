@@ -7,6 +7,7 @@ set(SRCS
   colour.c
   mpr121.c
   pattern_buffer.c
+  slider_leds.c
 )
 
 set(HDRS
@@ -14,6 +15,7 @@ set(HDRS
   colour.h
   mpr121.h
   pattern_buffer.c
+  slider_leds.h
 )
 
 add_library(${PROJECT_NAME} ${SRCS} ${HDRS})
@@ -27,10 +29,12 @@ target_include_directories(${PROJECT_NAME}
   $<BUILD_INTERFACE:${divacon_gold_src_SOURCE_DIR}>
 )
 
-target_link_libraries(${PROJECT_NAME} PUBLIC
+target_link_libraries(${PROJECT_NAME} PRIVATE
   divacon-common
   divacon-peripheral
 
+  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:hardware_structs>
+  $<$<NOT:$<BOOL:${UNIT_TESTING}>>:hardware_gpio>
   $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pico_stdlib>
   $<$<NOT:$<BOOL:${UNIT_TESTING}>>:pio_ws2812>
 )
