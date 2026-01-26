@@ -1,15 +1,17 @@
 #include "log/log.h"
+#include "usb/usb.h"
 
 #include <pico/stdlib.h>
 
-#include <stdio.h>
 
 int main()
 {
-    log_open(NULL);
+    set_sys_clock_khz(120000, true);
+
+    buttons_init();
+    usb_open();
 
     while (true) {
-        sleep_ms(1);
     }
 
     return 0;

@@ -9,6 +9,7 @@ add_subdirectory(menu)
 add_subdirectory(peripheral)
 add_subdirectory(slider)
 add_subdirectory(system)
+add_subdirectory(usb)
 
 project(divacon_gold_main VERSION 0.0.1 LANGUAGES ASM C CXX)
 
@@ -19,8 +20,13 @@ set(SRCS
 add_executable(${PROJECT_NAME} ${SRCS})
 
 if(NOT UNIT_TESTING)
-  pico_enable_stdio_usb(${PROJECT_NAME} ON)
-  pico_enable_stdio_uart(${PROJECT_NAME} OFF)
+  # USB stdio
+  # pico_enable_stdio_usb(${PROJECT_NAME} ON)
+  # pico_enable_stdio_uart(${PROJECT_NAME} OFF)
+
+  # UART stdio
+  pico_enable_stdio_usb(${PROJECT_NAME} OFF)
+  pico_enable_stdio_uart(${PROJECT_NAME} ON)
 
   # create map/bin/hex/uf2 file in addition to ELF.
   pico_add_extra_outputs(${PROJECT_NAME})
@@ -40,10 +46,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
+  divacon-buttons
   divacon-common
-  divacon-log
   divacon-slider
   divacon-system
+  divacon-usb
 
   pico_stdlib
 )

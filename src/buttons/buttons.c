@@ -113,7 +113,7 @@ void buttons_init(void)
     }
 }
 
-static bool is_button_set(const struct button_state *button)
+static inline bool is_button_set(const struct button_state *button)
 {
     return (button->counter >= BUTTON_COUNTER_THRESHOLD);
 }
