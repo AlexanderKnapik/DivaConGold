@@ -48,10 +48,13 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   divacon-buttons
   divacon-common
+  divacon-menu
   divacon-slider
   divacon-system
   divacon-usb
 
+  hardware_structs
+  hardware_i2c
   pico_stdlib
 )
 
