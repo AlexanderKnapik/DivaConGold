@@ -20,6 +20,7 @@ enum error {
     E_HARDWARE,
     E_IO,
     E_TIMEOUT,
+    E_BUSY,
 };
 
 #ifdef __cplusplus

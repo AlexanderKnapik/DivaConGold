@@ -3,12 +3,16 @@ cmake_minimum_required(VERSION 3.28)
 project(divacon-usb VERSION 0.0.1 LANGUAGES C)
 
 set(SRCS
+    hid.c
+    keyboard.c
     usb.c
     usb_descriptors.c
 
 )
 
 set(HDRS
+    hid.h
+    keyboard.h
     usb.h
     usb_descriptors.h
 )
