@@ -2,8 +2,11 @@
 
 #include "common/buttons_common.h"
 #include "common/error.h"
+#include "common/tusb_types.h"
 #include "common/util.h"
+#include "hid.h"
 #include "usb/usb_descriptors.h"
+#include "usb/usb_handle.h"
 
 #include <tusb.h>
 
@@ -12,12 +15,7 @@
 
 #define KEYBOARD_DESC_LEN (TUD_CONFIG_DESC_LEN + TUD_HID_DESC_LEN)
 
-struct nkro_report {
-    /* 32 bytes to fit all HID keycodes */
-    uint8_t keycode[(UINT8_MAX / UINT8_WIDTH)];
-};
-
-const tusb_desc_device_t keyboard_desc_device = {
+static const tusb_desc_device_t keyboard_desc_device = {
     .bLength = sizeof(tusb_desc_device_t),
     .bDescriptorType = TUSB_DESC_DEVICE,
     .bcdUSB = USB_SPEC_VER_BCD,
@@ -38,7 +36,7 @@ const tusb_desc_device_t keyboard_desc_device = {
 };
 
 /* TODO: Remove magic numbers */
-const uint8_t keyboard_desc_hid_report[] = {
+static const uint8_t keyboard_desc_hid_report[] = {
     0x05, 0x01,       // Usage Page (Generic Desktop Ctrls)
     0x09, 0x06,       // Usage (Keyboard)
     0xA1, 0x01,       // Collection (Application)
@@ -54,7 +52,7 @@ const uint8_t keyboard_desc_hid_report[] = {
     0xC0,             // End Collection
 };
 
-const uint8_t keyboard_desc_configuration[] = {
+static const uint8_t keyboard_desc_configuration[] = {
     // Config number, interface count, string index, total length, attribute, power in mA
     TUD_CONFIG_DESCRIPTOR(1, USB_ITF_NUM_TOTAL, USB_STR_ID_LANGID, KEYBOARD_DESC_LEN,
                           TUSB_DESC_CONFIG_ATT_REMOTE_WAKEUP, USB_POWER_MAX_mA),
@@ -76,48 +74,61 @@ const uint8_t keyboard_desc_configuration[] = {
  * @param [in] btn The state of the button press.
  * @param [in] key The look-up table index.
  */
-static void set_key(struct nkro_report *report, bool btn, uint8_t key)
+static void set_key(struct usb_report *report, bool btn, uint8_t key)
 {
     if (btn) {
         /* report->keycode(key / 8) |= 1 << (key % 8) */
-        report->keycode[key >> 3] |= 1 << (key & (UINT8_WIDTH - 1));
+        report->data[key >> 3] |= 1 << (key & (UINT8_WIDTH - 1));
     }
 }
 
 /* TODO: Slider State */
-static void fill_key_codes(struct nkro_report *report, const struct buttons *btns)
+static void keyboard_fill_report(struct usb_report *report, const struct buttons *btns)
 {
-    set_key(report, btns->triangle, HID_KEY_Z);
-    set_key(report, btns->square, HID_KEY_X);
-    set_key(report, btns->cross, HID_KEY_C);
-    set_key(report, btns->circle, HID_KEY_V);
+    if (report && btns) {
+        report->len = 32;
 
-    set_key(report, btns->up, HID_KEY_ARROW_UP);
-    set_key(report, btns->down, HID_KEY_ARROW_DOWN);
-    set_key(report, btns->left, HID_KEY_ARROW_LEFT);
-    set_key(report, btns->right, HID_KEY_ARROW_RIGHT);
+        set_key(report, btns->triangle, HID_KEY_Z);
+        set_key(report, btns->square, HID_KEY_X);
+        set_key(report, btns->cross, HID_KEY_C);
+        set_key(report, btns->circle, HID_KEY_V);
 
-    set_key(report, btns->start, HID_KEY_ENTER);
-    set_key(report, btns->select, HID_KEY_F1);
-    set_key(report, btns->home, HID_KEY_ESCAPE);
+        set_key(report, btns->up, HID_KEY_ARROW_UP);
+        set_key(report, btns->down, HID_KEY_ARROW_DOWN);
+        set_key(report, btns->left, HID_KEY_ARROW_LEFT);
+        set_key(report, btns->right, HID_KEY_ARROW_RIGHT);
 
-    set_key(report, btns->l1, HID_KEY_A);
-    set_key(report, btns->l2, HID_KEY_S);
-    set_key(report, btns->l3, HID_KEY_D);
+        set_key(report, btns->start, HID_KEY_ENTER);
+        set_key(report, btns->select, HID_KEY_F1);
+        set_key(report, btns->home, HID_KEY_ESCAPE);
 
-    set_key(report, btns->r1, HID_KEY_L);
-    set_key(report, btns->r2, HID_KEY_K);
-    set_key(report, btns->r3, HID_KEY_J);
+        set_key(report, btns->l1, HID_KEY_A);
+        set_key(report, btns->l2, HID_KEY_S);
+        set_key(report, btns->l3, HID_KEY_D);
+
+        set_key(report, btns->r1, HID_KEY_L);
+        set_key(report, btns->r2, HID_KEY_K);
+        set_key(report, btns->r3, HID_KEY_J);
+    }
 }
 
-enum error keyboard_send_report(const struct buttons *btns)
+static enum error keyboard_send_report_cb(const struct buttons *btns)
 {
-    struct nkro_report report = {};
-    fill_key_codes(&report, btns);
+    return hid_task(keyboard_fill_report, btns);
+}
 
-    if (!tud_hid_report(USB_REPORT_ID_KEYBOARD, &report, sizeof(struct nkro_report))) {
-        return E_HARDWARE;
+enum error keyboard_init(struct usb_handle *usb)
+{
+    if (!usb) {
+        return E_NULL_POINTER;
     }
+
+    *usb = (struct usb_handle){
+        .send_report_cb = keyboard_send_report_cb,
+        .desc_device = &keyboard_desc_device,
+        .desc_hid_report = keyboard_desc_hid_report,
+        .desc_configuration = keyboard_desc_configuration,
+    };
 
     return E_SUCCESS;
 }

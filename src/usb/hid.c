@@ -10,33 +10,36 @@
 
 #include <stdint.h>
 
-static enum error send_hid_report(uint8_t report_id, const struct buttons *btns)
+static enum error setup_task(void)
 {
-    /* skip if hid is not ready yet */
-    if (!tud_hid_ready())
-        return E_BUSY;
-
-    if (report_id == USB_REPORT_ID_KEYBOARD) {
-        return keyboard_send_report(btns);
-    }
-
-    return E_INVALID_INPUT;
-}
-
-/*
- * TODO: Remove the polling interval from the function. This should
- * be handled via some sort of scheduler instead.
- */
-enum error hid_task(void)
-{
-    const struct buttons *btns = buttons_read();
-
-    if (tud_suspended() && btns) {
+    if (tud_suspended()) {
         tud_remote_wakeup();
         return E_BUSY;
     }
 
-    return send_hid_report(USB_REPORT_ID_KEYBOARD, btns);
+    /* skip if hid is not ready yet */
+    if (!tud_hid_ready()) {
+        return E_BUSY;
+    }
+
+    return E_SUCCESS;
+}
+
+enum error hid_task(void (*fill_report_fn)(struct usb_report *, const struct buttons *),
+                    const struct buttons *btns)
+{
+    enum error err = setup_task();
+
+    if (err == E_SUCCESS) {
+        struct usb_report report = {};
+        fill_report_fn(&report, btns);
+
+        if (!tud_hid_report(USB_REPORT_ID_KEYBOARD, report.data, report.len)) {
+            err = E_HARDWARE;
+        }
+    }
+
+    return err;
 }
 
 /* Invoked when sent REPORT successfully to host */

@@ -23,14 +23,13 @@
  */
 #include "usb_descriptors.h"
 
-#include "usb/keyboard.h"
-
 #include <bsp/board_api.h>
 #include <tusb.h>
 
+#include <stddef.h>
 #include <stdint.h>
 
-char const *string_desc_arr[] = {
+static char const *string_desc_arr[] = {
     (const char[]){0x09, 0x04}, // 0: is supported language is English (0x0409)
     "TinyUSB",                  // 1: Manufacturer
     "TinyUSB Device",           // 2: Product
@@ -39,37 +38,6 @@ char const *string_desc_arr[] = {
 
 /* TODO: Remove magic numbers */
 static uint16_t desc_str[32 + 1] = {};
-
-/*
- * Invoked when received GET DEVICE DESCRIPTOR
- * Application return pointer to descriptor
- */
-uint8_t const *tud_descriptor_device_cb(void)
-{
-    return (uint8_t const *)&keyboard_desc_device;
-}
-
-/*
- * Invoked when received GET HID REPORT DESCRIPTOR
- * Application return pointer to descriptor
- * Descriptor contents must exist long enough for transfer to complete
- */
-uint8_t const *tud_hid_descriptor_report_cb(uint8_t instance)
-{
-    (void)instance;
-    return keyboard_desc_hid_report;
-}
-
-/*
- * Invoked when received GET CONFIGURATION DESCRIPTOR
- * Application return pointer to descriptor
- * Descriptor contents must exist long enough for transfer to complete
- */
-uint8_t const *tud_descriptor_configuration_cb(uint8_t index)
-{
-    (void)index; // for multiple configurations
-    return keyboard_desc_configuration;
-}
 
 /*
  * Invoked when received GET STRING DESCRIPTOR request.

@@ -1,6 +1,7 @@
 #include "buttons/buttons.h"
 #include "common/bsp.h"
 #include "common/error.h"
+#include "common/usb_common.h"
 #include "log/log.h"
 #include "menu/display.h"
 #include "peripheral/i2c.h"
@@ -50,12 +51,12 @@ int main()
 
     slider_handle_t slider = slider_open(&slider_config);
     display_handle_t display = display_open(&display_config);
-    usb_open();
+    usb_handle_t usb = usb_open(USB_MODE_KEYBOARD);
 
     while (true) {
         uint32_t touched_state = 0;
 
-        buttons_update();
+        const struct buttons *buttons = buttons_update();
 
         enum error err = slider_read(slider, &touched_state);
 
@@ -68,7 +69,7 @@ int main()
         }
 
         if (err == E_SUCCESS) {
-            err = usb_task();
+            err = usb_write(usb, buttons);
         }
     }
 
