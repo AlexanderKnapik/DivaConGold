@@ -11,7 +11,7 @@
 #include <stdint.h>
 
 /* Consecutive readings required for a state change */
-#define BUTTON_COUNTER_THRESHOLD (3U)
+#define BUTTON_COUNTER_THRESHOLD (1U)
 
 /**
  * @brief The internal state to initialise and debounce a button
