@@ -2,6 +2,7 @@
 
 #include "common/bsp.h"
 #include "common/error.h"
+#include "common/slider_common.h"
 #include "common/util.h"
 #include "peripheral/i2c.h"
 #include "slider/mpr121.h"
@@ -20,6 +21,7 @@
 struct slider_handle {
     mpr121_handle_t mpr121[4];
     slider_leds_handle_t leds;
+    struct slider_state prev_state;
 };
 
 const struct slider_leds_config slider_leds_config = {
@@ -151,22 +153,137 @@ static enum error read_touched_state(slider_const_handle_t slider, uint32_t *tou
     return err;
 }
 
-enum error slider_read(slider_const_handle_t slider, uint32_t *touched_state)
+/* The slider itself is broken up into two halves, being left and right.
+ * How the registration of the electrodes to any sort of direction is
+ * calculated is that the only left and right-most positions of each half
+ * are used, ignoring any touches that may be registered between those two
+ * extremes.
+ *
+ * The left and right halves then are mapped onto the left and right joysticks
+ * respectively. This is what allows double swipes/stars to be performed.
+ * However it also means that in order to perform these double actions, that
+ * they can't be performed using only one half of the slider and that the
+ * user's finger positions must be centred.
+ */
+static void decode_direction(enum slider_direction *dir, uint16_t prev_state, uint16_t curr_state)
 {
-    uint32_t tmp_touched = 0;
+    if (!dir) {
+        return;
+    }
 
-    enum error err = read_touched_state(slider, &tmp_touched);
+    /* No previous movement exists to be able to decode a swipe direction */
+    if (prev_state == 0) {
+        return;
+    }
+
+    /* If the slider is no longer being touched, cancel the swipe */
+    if (curr_state == 0) {
+        *dir = SLIDER_DIRECTION_NONE;
+        return;
+    }
+
+    /*
+     * Note:
+     * - Moving to the left is a left bit shift, so an increasing raw value.
+     * - Moving to the right is a right bit shift, so a decreasing raw value.
+     */
+    const uint16_t prev_lsb = lsb_u16(prev_state);
+    const uint16_t prev_msb = msb_u16(prev_state);
+    const uint16_t curr_lsb = lsb_u16(curr_state);
+    const uint16_t curr_msb = msb_u16(curr_state);
+
+    /* Both of the extremes stayed in the same position, keep the swipe in the
+     * same position as previous.
+     *
+     * TODO: Check if this is arcade accurate. I think controllers like the
+     * Divaller worked this way only, but not the official arcade controller.
+     */
+    if ((curr_msb == prev_msb) && (curr_lsb == prev_lsb)) {
+        return;
+    }
+
+    /* Both of the extremes moved away from each other, cancel the swipe */
+    if ((curr_msb > prev_msb) && (curr_lsb < prev_lsb)) {
+        *dir = SLIDER_DIRECTION_NONE;
+        return;
+    }
+
+    /* Both of the extremes moved closer to each other, cancel the swipe */
+    if ((curr_msb < prev_msb) && (curr_lsb > prev_lsb)) {
+        *dir = SLIDER_DIRECTION_NONE;
+        return;
+    }
+
+    /*
+     * Either or both of the extremes moved an electrode to the left.
+     * Register a swipe to the left.
+     */
+    if ((curr_msb > prev_msb) || (curr_lsb > prev_lsb)) {
+        *dir = SLIDER_DIRECTION_LEFT;
+        return;
+    }
+
+    /*
+     * Either or both of the extremes moved an electrode to the right.
+     * Register a swipe to the right.
+     */
+    if ((curr_msb < prev_msb) || (curr_lsb < prev_lsb)) {
+        *dir = SLIDER_DIRECTION_RIGHT;
+        return;
+    }
+}
+
+static enum error update_slider_state(slider_handle_t slider, struct slider_state *state,
+                                      uint32_t raw_state)
+{
+    if (!slider) {
+        return E_NULL_POINTER;
+    }
+
+    /*
+     * TODO: Clean up this previous state stuff that's going on. What I had to do was store the
+     * previous direction as part of the handle, as otherwise the state may be cleared in main(),
+     * this meant that I wasn't able to keep the state in a previously known state as it may be
+     * reset.
+     */
+    /* Decode the left half of the slider */
+    decode_direction(&slider->prev_state.left, (slider->prev_state.raw >> UINT16_WIDTH),
+                     (raw_state >> UINT16_WIDTH));
+
+    /* Decode the right half of the slider */
+    decode_direction(&slider->prev_state.right, slider->prev_state.raw, raw_state);
+
+    slider->prev_state.raw = raw_state;
+
+    if (state) {
+        state->raw = slider->prev_state.raw;
+        state->left = slider->prev_state.left;
+        state->right = slider->prev_state.right;
+    }
+
+    return E_SUCCESS;
+}
+
+enum error slider_read(slider_handle_t slider, struct slider_state *state)
+{
+    if (!slider) {
+        return E_NULL_POINTER;
+    }
+
+    uint32_t raw_state = 0;
+
+    enum error err = read_touched_state(slider, &raw_state);
 
     if (err == E_SUCCESS) {
-        err = slider_leds_ioctl_touched(slider->leds, tmp_touched);
+        err = update_slider_state(slider, state, raw_state);
+    }
+
+    if (err == E_SUCCESS) {
+        err = slider_leds_ioctl_touched(slider->leds, raw_state);
     }
 
     if (err == E_SUCCESS) {
         err = slider_leds_update(slider->leds);
-    }
-
-    if (touched_state) {
-        *touched_state = tmp_touched;
     }
 
     return err;

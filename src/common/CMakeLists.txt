@@ -14,6 +14,7 @@ set(HDRS
   buttons_common.h
   colour_common.h
   error.h
+  slider_common.h
   slider_leds_common.h
   usb_common.h
   util.h

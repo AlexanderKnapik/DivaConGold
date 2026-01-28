@@ -9,6 +9,7 @@ extern "C" {
 #endif
 
 #include "common/error.h"
+#include "common/slider_common.h"
 #include "peripheral/i2c.h"
 
 #include <stdint.h>
@@ -49,6 +50,8 @@ void slider_close(slider_handle_t slider);
  * In this circumstance, the user is holding down the four left-most electrodes
  * of the slider at once, this results in a read state of 0xF000 0000.
  *
+ * @todo Update the docstring for slider_state.
+ *
  * @param [in] slider The slider to read from.
  * @param [out] state Pointer to store the active slider electrode bitmask.
  * If NULL, the MPR121s are still read, but the result isn't stored.
@@ -60,7 +63,7 @@ void slider_close(slider_handle_t slider);
  * @retval E_TIMEOUT Reading from an MPR121 timed out.
  * @retval E_IO Reading from an MPR121 only partially completed.
  */
-enum error slider_read(slider_const_handle_t slider, uint32_t *touched_state);
+enum error slider_read(slider_handle_t slider, struct slider_state *state);
 
 #ifdef __cplusplus
 }

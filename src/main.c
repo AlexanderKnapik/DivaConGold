@@ -54,22 +54,21 @@ int main()
     usb_handle_t usb = usb_open(USB_MODE_KEYBOARD);
 
     while (true) {
-        uint32_t touched_state = 0;
-
         const struct buttons *buttons = buttons_update();
+        struct slider_state slider_state = {};
 
-        enum error err = slider_read(slider, &touched_state);
+        enum error err = slider_read(slider, &slider_state);
 
-        if (err == E_SUCCESS || err == E_HARDWARE) {
-            err = display_ioctl_touched(display, touched_state);
+        if (err == E_SUCCESS) {
+            err = usb_write(usb, buttons, &slider_state);
+        }
+
+        if (err == E_SUCCESS || err == E_BUSY) {
+            err = display_ioctl_touched(display, slider_state.raw);
         }
 
         if (err == E_SUCCESS) {
-            display_update(display);
-        }
-
-        if (err == E_SUCCESS) {
-            err = usb_write(usb, buttons);
+            err = display_update(display);
         }
     }
 
