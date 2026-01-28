@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#define DISPLAY_UPDATE_INTERVAL_ms (17U) /* 17 ms = 58.82 Hz */
+
 #define SSD1306_I2C_ADDRESS (0x3C)
 
 #define HEADER_Y_POS (0U)
@@ -319,6 +321,13 @@ enum error display_update(display_handle_t display)
 {
     if (!display) {
         return E_NULL_POINTER;
+    }
+
+    static uint32_t prev_tick_ms = 0;
+    const uint32_t curr_tick_ms = systick_now_ms();
+
+    if (systick_interval_ms(curr_tick_ms, prev_tick_ms) < DISPLAY_UPDATE_INTERVAL_ms) {
+        return E_BUSY;
     }
 
     ssd1306_clear(&display->ssd1306);
