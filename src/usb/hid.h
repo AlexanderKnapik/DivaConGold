@@ -9,8 +9,9 @@ extern "C" {
 #include "common/error.h"
 #include "usb/usb_handle.h"
 
-enum error hid_task(void (*fill_report_fn)(struct usb_report *, const struct buttons *),
-                    const struct buttons *btns);
+enum error hid_task(void (*fill_report_fn)(struct usb_report *, const struct buttons *,
+                                           const struct slider_state *),
+                    const struct buttons *btns, const struct slider_state *slider);
 
 #ifdef __cplusplus
 }

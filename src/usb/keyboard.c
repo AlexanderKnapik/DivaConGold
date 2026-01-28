@@ -1,7 +1,9 @@
 #include "keyboard.h"
 
+#include "class/hid/hid.h"
 #include "common/buttons_common.h"
 #include "common/error.h"
+#include "common/slider_common.h"
 #include "common/tusb_types.h"
 #include "common/util.h"
 #include "hid.h"
@@ -82,16 +84,20 @@ static void set_key(struct usb_report *report, bool btn, uint8_t key)
     }
 }
 
-/* TODO: Slider State */
-static void keyboard_fill_report(struct usb_report *report, const struct buttons *btns)
+static void keyboard_fill_report(struct usb_report *report, const struct buttons *btns,
+                                 const struct slider_state *slider)
 {
-    if (report && btns) {
-        report->len = 32;
+    if (!report) {
+        return;
+    }
 
-        set_key(report, btns->triangle, HID_KEY_Z);
-        set_key(report, btns->square, HID_KEY_X);
-        set_key(report, btns->cross, HID_KEY_C);
-        set_key(report, btns->circle, HID_KEY_V);
+    report->len = 32;
+
+    if (btns) {
+        set_key(report, btns->triangle, HID_KEY_I);
+        set_key(report, btns->square, HID_KEY_J);
+        set_key(report, btns->cross, HID_KEY_K);
+        set_key(report, btns->circle, HID_KEY_L);
 
         set_key(report, btns->up, HID_KEY_ARROW_UP);
         set_key(report, btns->down, HID_KEY_ARROW_DOWN);
@@ -110,11 +116,28 @@ static void keyboard_fill_report(struct usb_report *report, const struct buttons
         set_key(report, btns->r2, HID_KEY_K);
         set_key(report, btns->r3, HID_KEY_J);
     }
+
+    if (slider) {
+        if (slider->left == SLIDER_DIRECTION_LEFT) {
+            set_key(report, true, HID_KEY_Q);
+        }
+        else if (slider->left == SLIDER_DIRECTION_RIGHT) {
+            set_key(report, true, HID_KEY_Y);
+        }
+
+        if (slider->right == SLIDER_DIRECTION_LEFT) {
+            set_key(report, true, HID_KEY_R);
+        }
+        else if (slider->right == SLIDER_DIRECTION_RIGHT) {
+            set_key(report, true, HID_KEY_O);
+        }
+    }
 }
 
-static enum error keyboard_send_report_cb(const struct buttons *btns)
+static enum error keyboard_send_report_cb(const struct buttons *btns,
+                                          const struct slider_state *slider)
 {
-    return hid_task(keyboard_fill_report, btns);
+    return hid_task(keyboard_fill_report, btns, slider);
 }
 
 enum error keyboard_init(struct usb_handle *usb)

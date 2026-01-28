@@ -15,16 +15,26 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#define USB_POLL_INTERVAL_ms (10U)
+#define USB_POLL_INTERVAL_ms (1U)
 
 static struct usb_handle active_usb_handle = {};
 
 /*****************************************************************************/
 /*                            USB Driver Functions                           */
 /*****************************************************************************/
-enum error usb_write(usb_const_handle_t usb, const struct buttons *btns)
+enum error usb_write(usb_const_handle_t usb, const struct buttons *btns,
+                     const struct slider_state *slider)
 {
+    /*
+     * Must be called regularly (typically less than 1ms intervals) to ensure
+     * all USB events are processed in task context, where application callbacks
+     * also execute.
+     */
     tud_task();
+
+    if (!btns || !slider) {
+        return E_NULL_POINTER;
+    }
 
     const uint32_t current_tick_ms = systick_now_ms();
     static uint32_t prev_tick_ms = 0;
@@ -33,11 +43,7 @@ enum error usb_write(usb_const_handle_t usb, const struct buttons *btns)
         return E_BUSY;
     }
 
-    if (!btns) {
-        return E_NULL_POINTER;
-    }
-
-    const enum error err = usb->send_report_cb(btns);
+    const enum error err = usb->send_report_cb(btns, slider);
 
     if (err == E_SUCCESS) {
         prev_tick_ms = current_tick_ms;
@@ -48,20 +54,29 @@ enum error usb_write(usb_const_handle_t usb, const struct buttons *btns)
 
 usb_handle_t usb_open(enum usb_mode mode)
 {
+    struct usb_handle *const usb = &active_usb_handle;
+
+    /* If the active USB interface is already opened, then close it */
+    if (usb_close(usb) != E_SUCCESS) {
+        return NULL;
+    }
+
     /* init device stack on configured roothub port */
     if (!tud_init(BOARD_TUD_RHPORT)) {
         return NULL;
     }
 
-    struct usb_handle *const usb = &active_usb_handle;
+    enum error err = E_SUCCESS;
 
     if (mode == USB_MODE_KEYBOARD) {
-        if (keyboard_init(usb) == E_SUCCESS) {
-            return usb;
-        }
+        err = keyboard_init(usb);
     }
 
-    return NULL;
+    if (err != E_SUCCESS) {
+        return NULL;
+    }
+
+    return usb;
 }
 
 enum error usb_close(usb_handle_t usb)
