@@ -6,10 +6,10 @@
 
 uint8_t msb_u16(uint16_t val)
 {
-    /* Read from the msb first so that large values exit quicker. */
+    /* Read the first 1 bit from MSB to LSB order */
     for (uint8_t i = 0; i < UINT16_WIDTH; i++) {
-        if ((bool)(val & (1 << (UINT16_WIDTH - 1)))) {
-            return i;
+        if ((bool)(val & (0x8000U >> i))) {
+            return ((UINT16_WIDTH - 1) - i);
         }
     }
 
@@ -18,10 +18,10 @@ uint8_t msb_u16(uint16_t val)
 
 uint8_t lsb_u16(uint16_t val)
 {
-    /* Read from the lsb first so that small values exit quicker */
+    /* Read the first 1 bit from LSB to MSB order */
     for (uint8_t i = 0; i < UINT16_WIDTH; i++) {
         if ((bool)(val & (1 << i))) {
-            return i;
+            return (i + 1);
         }
     }
 
